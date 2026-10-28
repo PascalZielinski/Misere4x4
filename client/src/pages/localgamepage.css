@@ -4,12 +4,17 @@
   color: var(--fg);
 }
 
-/* Gesamte Gruppe (Feld + Panel) mittig auf der Seite */
+/* Layout-Variablen */
 .game-main {
   --cell-size: 96px;
   --gap: 8px;
   --board-size: calc(var(--cell-size) * 4 + var(--gap) * 5);
   --panel-width: 280px;
+
+  /* Höhe des Turn-Panels + Lücke zum Spielfeld */
+  --turn-panel-height: 32px;
+  --turn-panel-gap: 10px;
+  --top-offset: calc(var(--turn-panel-height) + var(--turn-panel-gap));
 
   /* Light: dunkles Brett, helle Felder */
   --board-bg: #8a5230;
@@ -34,7 +39,7 @@
   --board-shadow: rgba(0, 0, 0, 0.5);
 }
 
-.game-layout {
+.game-row {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -42,14 +47,102 @@
   gap: 40px;
 }
 
-/* ---------- Spielfeld ---------- */
+.board-col {
+  display: flex;
+  flex-direction: column;
+}
 
-/* [Buchstaben | Feld] / [Ecke | Zahlen] */
+/* Grid, das Spielfeld, Labels und Turn-Panel beinhaltet */
 .board-area {
   display: grid;
   grid-template-columns: auto auto;
-  gap: 10px 14px;
+  gap: var(--turn-panel-gap) 14px;
 }
+
+/* ---------- Turn-Panel ---------- */
+
+.turn-panel-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: var(--turn-panel-height);
+}
+
+.turn-panel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  background: var(--accent);
+  color: var(--accent-fg);
+  border-radius: 6px;
+  font-weight: 700;
+  white-space: nowrap;
+  transform-origin: center;
+}
+
+/* Versteckt, solange das Overlay offen ist */
+.turn-panel.hidden {
+  visibility: hidden;
+}
+
+/* Das Schütteln: 1.8s Dauer (0.8s Schütteln + 1s Pause) */
+.turn-panel.shaking {
+  animation: turn-shake 1.8s ease-in-out infinite;
+}
+
+@keyframes turn-shake {
+  /* Schütteln für 0.8s (ca. 45% von 1.8s) */
+  0%    { transform: rotate(0deg); }
+  5%    { transform: rotate(-2deg); }
+  15%   { transform: rotate(2deg); }
+  25%   { transform: rotate(-2deg); }
+  35%   { transform: rotate(2deg); }
+  45%   { transform: rotate(0deg); }
+  
+  /* Pause für 1s (von 45% bis 100%) */
+  100%  { transform: rotate(0deg); }
+}
+
+/* Nur der Text animiert sich: Pop beim Wechsel, dann Pulsieren */
+.turn-text {
+  display: inline-block !important;
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1;
+  transform-origin: center;
+  will-change: transform;
+  
+  animation: 
+    turn-pop 0.4s ease-out,
+    turn-pulse 1.5s ease-in-out infinite 0.4s !important;
+}
+
+@keyframes turn-pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.5); }
+  100% { transform: scale(1); }
+}
+
+@keyframes turn-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.15); }
+}
+
+/* Die Farben für die Mark-Box (global, für alle Bildschirmgrößen) */
+.turn-panel .mark-box {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  font-size: 0.85rem;
+  background: #2d2420; 
+  color: #efe6d6; 
+  border: none;
+  border-radius: 4px;
+}
+
+/* ---------- Spielfeld ---------- */
 
 .board {
   display: grid;
@@ -88,13 +181,8 @@
   cursor: default;
 }
 
-.cell-x {
-  color: var(--accent);
-}
-
-.cell-o {
-  color: var(--fg);
-}
+.cell-x { color: var(--accent); }
+.cell-o { color: var(--fg); }
 
 /* ---------- Beschriftung ---------- */
 
@@ -121,12 +209,18 @@
   padding: 0 var(--gap);
 }
 
-/* ---------- Seitenpanel (gleiche Höhe wie das Feld) ---------- */
+/* ---------- Seitenpanel ---------- */
+
+.panel-wrap {
+  margin-top: var(--top-offset);
+  position: relative;
+}
 
 .panel {
   display: flex;
   flex-direction: column;
-  width: var(--panel-width);
+  width: max-content;
+  min-width: var(--panel-width);
   height: var(--board-size);
   overflow: hidden;
   background: var(--surface);
@@ -135,13 +229,12 @@
   color: var(--fg);
 }
 
-/* Drei Bereiche = drei Opacity-Stufen der Akzentfarbe */
 .panel-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 10px 12px;
+  padding: 14px 16px;
   font-size: 1.1rem;
   font-weight: 600;
   text-align: center;
@@ -150,7 +243,6 @@
 
 .panel-title-text {
   flex: 1;
-  min-width: 0;
   white-space: nowrap;
 }
 
@@ -182,29 +274,9 @@
   align-self: end;
   margin-bottom: 8px;
   padding: 4px 12px;
-  border: 2px solid transparent; /* Platz für den Rahmen ist immer da, nichts springt */
-  border-radius: 6px;
   text-align: center;
   font-size: 0.95rem;
   white-space: nowrap;
-}
-
-.player-name.active {
-  border-color: var(--accent);
-  font-weight: 700;
-  animation: name-pulse 1.1s ease-in-out infinite;
-}
-
-@keyframes name-pulse {
-  0%, 100% { transform: scale(1); }
-  50%      { transform: scale(1.12); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .player-name.active {
-    animation: none;
-    transform: scale(1.08);
-  }
 }
 
 .panel-moves {
@@ -247,15 +319,39 @@
   font-weight: 500;
 }
 
-.panel-title {
-  padding: 14px 16px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  text-align: center;
-  background: color-mix(in srgb, var(--accent) 40%, transparent);
+/* Retry-Button */
+.retry-btn {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  display: grid;
+  place-items: center;
+  padding: 2px;
+  background: none;
+  border: none;
+  color: var(--fg);
+  cursor: pointer;
+  transition: transform 0.2s;
 }
 
-/* ---------- Overlay ---------- */
+.retry-btn:hover {
+  transform: rotate(-90deg);
+}
+
+.retry-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-color: currentColor;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+/* ---------- Overlay & Startmenü ---------- */
 
 .overlay {
   position: fixed;
@@ -357,16 +453,75 @@
   opacity: 0.8;
 }
 
-/* Retry-Button: über dem Panel, an der linken Ecke */
-.panel-wrap {
-  position: relative;
+.ov-spin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 0;
+  text-align: center;
 }
 
-.retry-btn {
+.ov-spin-text {
+  margin: 0;
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+.ov-spin-name {
+  margin: 0;
+  min-height: 2.4rem;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.ov-spin-name.final {
+  color: var(--accent);
+  animation: spin-pop 0.35s ease-out;
+}
+
+.cell {
+  position: relative;
+  transition: filter 0.15s ease;
+}
+
+.cell-mark {
+  position: relative;
+  z-index: 1;
+}
+
+.cell-pill {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--len);
+  height: 15%;
+  transform: translate(-50%, -50%) rotate(var(--angle));
+  border: none;
+  border-radius: 999px;
+  background: #e5484d;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ... dein bisheriges CSS ... */
+
+/* --- Buttons über dem Panel --- */
+.panel-top-actions {
   position: absolute;
   bottom: 100%;
   left: 0;
-  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: var(--turn-panel-height);
+  margin-bottom: var(--turn-panel-gap);
+}
+
+.retry-btn {
   display: grid;
   place-items: center;
   padding: 2px;
@@ -394,42 +549,40 @@
   mask-size: contain;
 }
 
-/* ---------- Auslosung ---------- */
-
-.ov-spin {
+/* Der neue Fast-Reset Button */
+.fast-reset-btn {
+  height: var(--turn-panel-height);
+  padding: 0 12px;
+  background: var(--surface);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 16px;
-  padding: 12px 0;
-  text-align: center;
+  justify-content: center;
+  transition: background 0.2s, border-color 0.2s;
 }
 
-.ov-spin-text {
-  margin: 0;
-  font-size: 1rem;
-  opacity: 0.8;
+.fast-reset-btn:hover {
+  background: var(--border);
+  border-color: var(--accent);
 }
 
-.ov-spin-name {
-  margin: 0;
-  min-height: 2.4rem; /* verhindert Springen beim Wechsel */
-  max-width: 100%;
-  overflow-wrap: anywhere;
-  font-size: 1.8rem;
-  font-weight: 700;
-  line-height: 1.3;
-}
-
-.ov-spin-name.final {
-  color: var(--accent);
-  animation: spin-pop 0.35s ease-out;
-}
+/* ... Restliches CSS (Overlay etc.) ... */
 
 @keyframes spin-pop {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.15); }
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.15); }
   100% { transform: scale(1); }
+}
+
+@media (hover: hover) {
+  .cell:not(:disabled):not([aria-disabled="true"]):hover {
+    filter: brightness(2.15);
+  }
 }
 
 /* ---------- Responsive ---------- */
@@ -445,24 +598,33 @@
   .game-main {
     --cell-size: 56px;
     --gap: 6px;
-      .panel-title-text {
-      white-space: normal;
-      overflow-wrap: anywhere;
-    }
+    --turn-panel-height: 28px;
   }
-  
+
+  .panel-title-text {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
 
   .panel {
-    display: flex;
-    flex-direction: column;
-    width: max-content;
-    min-width: var(--panel-width);
+    width: 100%;
     max-width: 100%;
-    height: var(--board-size);
-    overflow: hidden;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    color: var(--fg);
+    height: auto;
+    min-height: var(--board-size);
+  }
+
+  .turn-text {
+    font-size: 0.95rem;
+  }
+
+  .turn-panel {
+    gap: 6px;
+    padding: 2px 8px;
+  }
+
+  .turn-panel .mark-box {
+    width: 18px;
+    height: 18px;
+    font-size: 0.75rem;
   }
 }

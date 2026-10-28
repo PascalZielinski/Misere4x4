@@ -1,0 +1,85 @@
+.landing-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+  background: var(--nav-bg);
+  color: var(--nav-fg);
+  border-bottom: 1px solid var(--nav-border);
+}
+
+.landing-logo {
+  color: var(--nav-fg);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* --- Buttons (Theme & Sound) --- */
+.theme-toggle,
+.sound-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.9rem;
+  background: var(--surface);
+  color: var(--nav-fg);
+  border: 1px solid var(--nav-fg);
+  border-radius: 999px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.theme-toggle:hover,
+.sound-toggle:hover {
+  border-color: var(--accent);
+}
+
+/* --- Sound Dropdown --- */
+.sound-menu-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.sound-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 50;
+  width: max-content;
+}
+
+.sound-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sound-control input[type="range"] {
+  width: 100px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* Dark Mode: Icons invertieren */
+:root[data-theme='dark'] .theme-toggle img,
+:root[data-theme='dark'] .sound-toggle img,
+:root[data-theme='dark'] .sound-control img {
+  filter: invert(1);
+}

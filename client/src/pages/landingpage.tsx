@@ -56,6 +56,13 @@ export default function LandingPage() {
           </p>
         )}
       </main>
+
+      {/* FOOTER DIREKT HIER */}
+      <footer className="site-footer">
+        <Link to="/licenses" className="footer-link">
+          Lizenzen &amp; Credits
+        </Link>
+      </footer>
     </div>
   )
 }

@@ -1,44 +1,8 @@
-:root[data-theme='dark'] .theme-toggle img {
-  filter: invert(1);
-}
-
 .landing {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-}
-
-.landing-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 1.5rem;
-  background: var(--nav-bg);
-  color: var(--nav-fg);
-  border-bottom: 1px solid var(--nav-border);
-}
-
-.landing-logo {
-  color: var(--nav-fg);
-  text-decoration: none;
-  font-weight: 700;
-  font-size: 1.1rem;
-}
-
-.theme-toggle {
-  padding: 0.4rem 0.9rem;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--surface);
-  color: var(--fg);
-  font-size: 0.9rem;
-  cursor: pointer;
-  color: var(--nav-fg);
-  border: 1px solid var(--nav-fg);
-}
-
-.theme-toggle:hover {
-  border-color: var(--accent);
+  padding-bottom: 60px; /* Platz für den fixierten Footer */
 }
 
 .landing-main {
@@ -95,4 +59,33 @@ button.landing-btn {
 .landing-btn--primary {
   background: var(--accent);
   color: var(--accent-fg);
+}
+
+/* --- FIXIERTER FOOTER --- */
+.site-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  background: var(--nav-bg);
+  color: var(--nav-fg);
+  border-top: 1px solid var(--nav-border);
+  font-size: 0.85rem;
+  z-index: 100;
+}
+
+.footer-link {
+  color: var(--nav-fg);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.footer-link:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
 }
