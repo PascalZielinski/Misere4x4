@@ -8,7 +8,12 @@ import LocalGame from "./pages/localgamepage"
 import LicensesPage from "./pages/licensespage"
 import TutorialPage from "./pages/Tutorialpage"
 import AdminPage from "./pages/Adminpage"
+import AdminDashboard from "./pages/AdminDashboard"
 import BackgroundMusic from "./components/BackgroundMusic"
+import OnlinePage from "./pages/Onlinepage"
+import QueuePage from "./pages/Queuepage"
+import PrivateRoomPage from "./pages/Privateroompage"
+import RatingPage from "./pages/Ratingpage"
 
 function RootLayout() {
   return (
@@ -48,7 +53,13 @@ const router = createBrowserRouter([
       { path: "local", element: <LocalGame /> },
       { path: "licenses", element: <LicensesPage /> },
       { path: "tutorial", element: <TutorialPage /> },
-      { path: "admin", element: <AdminPage />},
+      { path: "admin", element: <AdminPage /> },
+      { path: "admin/dashboard", element: <AdminDashboard /> },
+      { path: "online", element: <OnlinePage /> },
+      { path: "online/queue", element: <QueuePage /> },
+      { path: "online/private", element: <PrivateRoomPage /> },
+      //{ path: "online/private/room/:code?", element: <PrivateRoomLobbyPage /> },
+      { path: "rating", element: <RatingPage />},
       { path: "*", element: <NotFound /> },
     ],
   },

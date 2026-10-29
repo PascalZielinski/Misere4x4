@@ -1,6 +1,8 @@
 /* ---------- 404 Seite ---------- */
 
 .not-found {
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -10,6 +12,71 @@
   text-align: center;
   background: var(--bg);
   color: var(--fg);
+}
+
+/* Hintergrund: Reihen untereinander */
+.not-found-bg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.not-found-row {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* Laufband */
+.not-found-track {
+  display: flex;
+  flex-shrink: 0;
+  width: max-content;
+  will-change: transform;
+  animation-duration: 60s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.not-found-track--right { animation-name: not-found-right; }
+.not-found-track--left  { animation-name: not-found-left; }
+
+.not-found-item {
+  padding-right: 3rem;
+  font-size: clamp(1.25rem, 3vw, 2rem); /* klein und überall gleich */
+  font-weight: 800;
+  line-height: 1;
+  color: var(--accent);
+  opacity: 0.12;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* -50% = genau eine Hälfte, dadurch nahtlose Schleife */
+@keyframes not-found-left {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-10%); }
+}
+
+@keyframes not-found-right {
+  from { transform: translateX(-10%); }
+  to   { transform: translateX(0); }
+}
+
+/* Inhalt über dem Hintergrund */
+.not-found-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .not-found h1 {

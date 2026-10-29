@@ -123,5 +123,41 @@
         "cmd": "Öffne ein cmd fenster",
         "gamestart": "Schreib 3erReihe -start",
         "follow": "Folge den anweisungen"
+    },
+    "online": {
+        "queue": "Queue",
+        "privateGame": "Privatesspiel",
+        "playerInQueue": "Spieler Wartend",
+        "leaveQueue": "Spielersuche abbrechen"
+    },
+    "privateRoom": {
+        "title": "Privater Raum",
+        "subtitle": "Spiele mit einem Freund: Erstelle einen Raum oder tritt mit einem Code bei.",
+        "createTitle": "Neuen Raum erstellen",
+        "createText": "Du bekommst einen 4-stelligen Code, den du deinem Gegner schickst.",
+        "create": "Raum erstellen",
+        "creating": "Wird erstellt …",
+        "or": "oder",
+        "joinTitle": "Raum beitreten",
+        "codeLabel": "Raumcode",
+        "hint": "Gib den 4-stelligen Code deines Freundes ein.",
+        "join": "Beitreten",
+        "joining": "Trete bei …",
+        "invalid": "Bitte gib einen gültigen 4-stelligen Code ein.",
+        "notFound": "Kein Raum mit diesem Code gefunden.",
+        "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+    },
+    "rating": {
+        "title": "Wie war deine Erfahrung?",
+        "subtitle": "Wähle Sterne und lass uns optional eine Bemerkung da.",
+        "star": "Stern",
+        "stars": "Sterne",
+        "comment": "Bemerkung (optional)",
+        "placeholder": "Was hat dir gefallen? Was können wir besser machen?",
+        "submit": "Absenden",
+        "sending": "Wird gesendet…",
+        "success": "Danke für dein Feedback!",
+        "error": "Konnte nicht gesendet werden. Versuch es nochmal.",
+        "rating": "Bewertung"
     }
 }

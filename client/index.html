@@ -1,29 +1,12 @@
 <!doctype html>
 <html lang="en">
-  <script>
-    (function () {
-      var m = document.cookie.match(/(?:^|; )theme=(light|dark)/);
-      var theme = m
-        ? m[1]
-        : window.matchMedia('(prefers-color-scheme: dark)').matches
-          ? 'dark'
-          : 'light';
-      document.documentElement.setAttribute('data-theme', theme);
-    })();
-  </script>
   <head>
     <meta charset="UTF-8" />
+    <script src="/theme-init.js"></script>
+    <meta name="description" content="Application project Three in a row.">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>misere4x4</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
-
   </head>
   <body>
     <div id="root"></div>

@@ -1,5 +1,5 @@
 :root {
-  --font-main: 'Roboto', 'Open Sans', 'Lato', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+  --font-main: 'Roboto', 'Open Sans', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
 
   color-scheme: light;
   --bg: #f3ece0;

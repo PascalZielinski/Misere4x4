@@ -123,5 +123,41 @@
         "cmd": "Open a cmd window",
         "gamestart": "Typ 3erReihe -start",
         "follow": "Follow the steps"
+    },
+    "online": {
+        "queue": "Queue",
+        "privateGame": "Private Game",
+        "playerInQueue": "Waiting Game",
+        "leaveQueue": "Leave Queue"
+    },
+    "privateRoom": {
+        "title": "Private Room",
+        "subtitle": "Play with a friend: create a room or join one with a code.",
+        "createTitle": "Create a new room",
+        "createText": "You'll get a 4-digit code to send to your opponent.",
+        "create": "Create room",
+        "creating": "Creating …",
+        "or": "or",
+        "joinTitle": "Join a room",
+        "codeLabel": "Room code",
+        "hint": "Enter your friend's 4-digit code.",
+        "join": "Join",
+        "joining": "Joining …",
+        "invalid": "Please enter a valid 4-digit code.",
+        "notFound": "No room found with this code.",
+        "generic": "Something went wrong. Please try again."
+    },
+    "rating": {
+        "title": "How was your experience?",
+        "subtitle": "Choose a star rating and optionally leave a comment.",
+        "star": "Star",
+        "stars": "Stars",
+        "comment": "Comment (optional)",
+        "placeholder": "What did you like? What could we improve?",
+        "submit": "Submit",
+        "sending": "Sending…",
+        "success": "Thank you for your feedback!",
+        "error": "Could not submit your feedback. Please try again.",
+        "rating": "Raiting"
     }
 }

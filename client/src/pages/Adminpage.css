@@ -934,16 +934,9 @@
   width: 76px;
   height: 76px;
   border-radius: 50%;
-  background: radial-gradient(
-    circle at 35% 32%,
-    #fffef2 0%,
-    #f6f0d6 40%,
-    #d8d0b0 72%,
-    #b9b090 100%
-  );
-  box-shadow:
-    0 0 40px 14px rgba(255, 250, 220, 0.35),
-    inset -8px -6px 12px rgba(0, 0, 0, 0.25);
+  background: transparent;
+  box-shadow: 15px 15px 0 0 #fdfbd3;
+  filter: drop-shadow(0 0 18px rgba(253, 251, 211, 0.45));
   transition: opacity 1.2s ease;
 }
 
@@ -956,12 +949,85 @@
 
 .desktop-star {
   position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.9);
+  animation: desktop-star-twinkle 3.4s ease-in-out infinite;
+}
+
+/* ---------- Sternschnuppen ---------- */
+
+.desktop-meteors {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  transition: opacity 1.2s ease;
+}
+
+.desktop-meteor {
+  position: absolute;
   width: 2px;
   height: 2px;
   border-radius: 50%;
   background: #fff;
-  box-shadow: 0 0 3px rgba(255, 255, 255, 0.9);
-  animation: desktop-star-twinkle 3.4s ease-in-out infinite;
+  box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.55);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.desktop-meteor::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 140px;
+  height: 1px;
+  transform: translateY(-50%);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.95),
+    rgba(255, 255, 255, 0)
+  );
+}
+
+.desktop-meteor--1 {
+  top: 10%;
+  left: 105%;
+  animation: desktop-meteor-shoot 9s linear infinite;
+}
+.desktop-meteor--2 {
+  top: 22%;
+  left: 105%;
+  animation: desktop-meteor-shoot 13s linear infinite 3.5s;
+}
+.desktop-meteor--3 {
+  top: 32%;
+  left: 105%;
+  animation: desktop-meteor-shoot 11s linear infinite 6.5s;
+}
+.desktop-meteor--4 {
+  top: 42%;
+  left: 105%;
+  animation: desktop-meteor-shoot 15s linear infinite 10s;
+}
+
+@keyframes desktop-meteor-shoot {
+  0% {
+    transform: translate(0, 0) rotate(-35deg);
+    opacity: 0;
+  }
+  4% {
+    opacity: 1;
+  }
+  14% {
+    transform: translate(-120vw, 70vh) rotate(-35deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-120vw, 70vh) rotate(-35deg);
+    opacity: 0;
+  }
 }
 
 @keyframes desktop-star-twinkle {
@@ -1169,7 +1235,9 @@ button.desktop-tray:focus-visible {
   .desktop-sun,
   .desktop-moon,
   .desktop-stars,
-  .desktop-hill {
+  .desktop-hill,
+  .desktop-meteors,
+  .desktop-meteor {
     animation: none;
     transition: none;
   }

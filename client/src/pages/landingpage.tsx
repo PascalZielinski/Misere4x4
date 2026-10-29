@@ -1,11 +1,13 @@
 import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { useNavigate, useParams, useSearchParams } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import './landingpage.css'
 import NavBar from '../components/NavBar'
 import LocalizedLink from '../components/LocalizedLink'
 
 const SERVER = import.meta.env.VITE_SERVER as string | undefined
+// Debug: Server-Check überspringen, wenn VITE_DEBUG=true gesetzt ist
+const DEBUG = import.meta.env.VITE_DEBUG === 'true'
 
 async function pingServer(): Promise<boolean> {
   if (!SERVER) return false
@@ -29,10 +31,20 @@ export default function LandingPage() {
   const { t } = useTranslation()
   const { lang } = useParams()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [checking, setChecking] = useState(false)
   const [serverDown, setServerDown] = useState(false)
 
+  // Debug aktiv via Env-Var ODER ?debug=1 in der URL
+  const isDebug = DEBUG || searchParams.get('debug') === '1'
+
   const goOnline = async () => {
+    if (isDebug) {
+      // Server-Check komplett überspringen
+      navigate(`/${lang}/online`)
+      return
+    }
+
     setChecking(true)
     setServerDown(false)
     const ok = await pingServer()
@@ -51,7 +63,11 @@ export default function LandingPage() {
             {t('landing.playLocal')}
           </LocalizedLink>
           <button className="landing-btn" onClick={goOnline} disabled={checking}>
-            {checking ? t('landing.checkingServer') : t('landing.playOnline')}
+            {checking
+              ? t('landing.checkingServer')
+              : isDebug
+                ? `${t('landing.playOnline')} (Debug)`
+                : t('landing.playOnline')}
           </button>
           <LocalizedLink to="/tutorial" className="landing-btn landing-btn--ghost">
             {t('landing.tutorial')}
@@ -65,6 +81,11 @@ export default function LandingPage() {
       </main>
 
       <footer className="site-footer">
+        <div className="site-footer__item site-footer__item--rating">
+          <LocalizedLink to="/rating" className="footer-link">
+            {t('landing.rating')}
+          </LocalizedLink>
+        </div>
         <div className="site-footer__item site-footer__item--license">
           <LocalizedLink to="/licenses" className="footer-link">
             {t('landing.licensesCredits')}
