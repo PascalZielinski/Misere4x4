@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { Navigate, useNavigate, useParams } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import NavBar from '../components/NavBar'
 import { useAudioSettings } from '../utils/audioSettings'
@@ -9,6 +9,17 @@ import './Adminpage.css'
 const PASSWORD = 'LOUVRE'
 
 export default function AdminPage() {
+  const { lang } = useParams()
+
+  // Bereits eingeloggt? → sofort weiter zum Dashboard
+  if (sessionStorage.getItem('adminUser')) {
+    return <Navigate to={`/${lang}/admin/dashboard`} replace />
+  }
+
+  return <AdminLogin />
+}
+
+function AdminLogin() {
   const { t } = useTranslation()
   const { lang } = useParams()
   const navigate = useNavigate()
@@ -16,17 +27,13 @@ export default function AdminPage() {
   const [password, setPassword] = useState('')
   const [failed, setFailed] = useState(false)
 
-  // Musik
   const musicRef = useRef<HTMLAudioElement>(null)
   const { music } = useAudioSettings()
 
-  // Volume an Setting koppeln
   useEffect(() => {
     if (musicRef.current) musicRef.current.volume = music / 100
   }, [music])
 
-  // Play beim Mount + Pause beim Unmount
-  // (Autoplay wird ggf. vom Browser blockiert → Fallback unten)
   useEffect(() => {
     const a = musicRef.current
     if (!a) return
@@ -36,16 +43,14 @@ export default function AdminPage() {
       a!.play().catch(() => {})
     }
 
-    // Direkt versuchen
     tryPlay()
 
-    // Falls Autoplay blockiert: beim ersten Klick/Tastendruck starten
     const events = ['pointerdown', 'pointerup', 'keydown'] as const
     function remove() {
       events.forEach((e) => window.removeEventListener(e, tryPlay))
     }
     events.forEach((e) => window.addEventListener(e, tryPlay))
-    // Nach erfolgreichem Play entfernen
+
     const onPlaying = () => remove()
     a.addEventListener('playing', onPlaying)
 

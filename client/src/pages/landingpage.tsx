@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import './landingpage.css'
 import NavBar from '../components/NavBar'
 import LocalizedLink from '../components/LocalizedLink'
+import PumpkinCarver from '../components/PumpkinCarver'
 
 const SERVER = import.meta.env.VITE_SERVER as string | undefined
 // Debug: Server-Check überspringen, wenn VITE_DEBUG=true gesetzt ist
@@ -35,12 +36,11 @@ export default function LandingPage() {
   const [checking, setChecking] = useState(false)
   const [serverDown, setServerDown] = useState(false)
 
-  // Debug aktiv via Env-Var ODER ?debug=1 in der URL
   const isDebug = DEBUG || searchParams.get('debug') === '1'
 
   const goOnline = async () => {
     if (isDebug) {
-      // Server-Check komplett überspringen
+
       navigate(`/${lang}/online`)
       return
     }
@@ -59,9 +59,12 @@ export default function LandingPage() {
 
       <main className="landing-main">
         <div className="landing-buttons">
-          <LocalizedLink to="/local" className="landing-btn landing-btn--primary">
-            {t('landing.playLocal')}
-          </LocalizedLink>
+          <div className="landing-pumpkin-stack">
+            <PumpkinCarver />
+            <LocalizedLink to="/local" className="landing-btn landing-btn--primary">
+              {t('landing.playLocal')}
+            </LocalizedLink>
+          </div>
           <button className="landing-btn" onClick={goOnline} disabled={checking}>
             {checking
               ? t('landing.checkingServer')

@@ -14,6 +14,7 @@ import OnlinePage from "./pages/Onlinepage"
 import QueuePage from "./pages/Queuepage"
 import PrivateRoomPage from "./pages/Privateroompage"
 import RatingPage from "./pages/Ratingpage"
+import Unauthorized from "./pages/401"
 
 function RootLayout() {
   return (
@@ -60,6 +61,7 @@ const router = createBrowserRouter([
       { path: "online/private", element: <PrivateRoomPage /> },
       //{ path: "online/private/room/:code?", element: <PrivateRoomLobbyPage /> },
       { path: "rating", element: <RatingPage />},
+      { path: "401", element: <Unauthorized />},
       { path: "*", element: <NotFound /> },
     ],
   },

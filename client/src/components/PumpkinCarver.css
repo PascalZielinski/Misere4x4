@@ -1,0 +1,107 @@
+.pumpkin-mini,
+.pumpkin-mini:hover,
+.pumpkin-mini:active {
+  transform: none;
+}
+
+.pumpkin-mini {
+  align-self: flex-start;
+  position: relative;
+  width: 55px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.pumpkin-mini:hover {
+  transform: scale(1.06) rotate(-3deg);
+}
+
+.pumpkin-mini img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  transition: transform 0.15s;
+}
+
+.pumpkin-mini:hover img {
+  transform: scale(1.06) rotate(-3deg);
+}
+
+.pumpkin-mini__skin {
+  position: absolute;
+  inset: 0;
+}
+
+.pumpkin-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  background: rgba(0, 0, 0, 0.88);
+}
+
+.pumpkin-stage {
+  position: relative;
+  width: min(90vw, 520px);
+  max-height: 70vh;
+}
+
+.pumpkin-stage img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 70vh;
+  object-fit: contain;
+  user-select: none;
+}
+
+.pumpkin-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: none;
+  touch-action: none;
+}
+
+.pumpkin-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.pumpkin-btn {
+  padding: 0.8rem 2rem;
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--fg);
+  font: inherit;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pumpkin-btn--primary {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+.pumpkin-preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.pumpkin-knife img {
+  display: block;
+  user-select: none;
+} 

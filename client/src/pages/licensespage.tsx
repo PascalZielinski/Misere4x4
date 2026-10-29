@@ -128,6 +128,48 @@ export default function LicensesPage() {
             </ul>
           </section>
 
+          {/* --- INSPIRATION: NEAL.FUN --- */}
+          <section className="license-section">
+            <h2>{t('licenses.inspiration.title')}</h2>
+            <p>
+              <Trans
+                i18nKey="licenses.inspiration.intro"
+                components={{ author: <strong /> }}
+              />
+            </p>
+            <ul>
+              <li>
+                <strong>{t('licenses.labels.creator')}</strong>{' '}
+                <a
+                  href="https://neal.fun/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Neal Agarwal (neal.fun)
+                </a>
+              </li>
+              <li>
+                <strong>{t('licenses.labels.inspiration')}</strong>{' '}
+                {t('licenses.inspiration.note')}
+              </li>
+              <li>
+                <strong>{t('licenses.labels.credit')}</strong>{' '}
+                <Trans
+                  i18nKey="licenses.inspiration.credit"
+                  components={{
+                    neal: (
+                      <a
+                        href="https://neal.fun/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      />
+                    ),
+                  }}
+                />
+              </li>
+            </ul>
+          </section>
+
           {/* --- AUFGABENSTELLUNG --- */}
           <section className="license-section">
             <h2>{t('licenses.task.title')}</h2>

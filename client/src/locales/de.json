@@ -6,7 +6,8 @@
         "tutorial": "Tutorial",
         "serverDown": "Server aktuell nicht verfügbar",
         "licensesCredits": "Lizenzen & Credits",
-        "admin": "Admin"
+        "admin": "Admin",
+        "rating": "Bewertung"
     },
     "nav": {
         "language": "Sprache",
@@ -28,7 +29,10 @@
             "recording": "Aufnahme und Produktion:",
             "arrangement": "Arrangement:",
             "source": "Quelle:",
-            "license": "Lizenz:"
+            "license": "Lizenz:",
+            "creator": "Erschaffer:",
+            "inspiration": "Inspiration:",
+            "credit": "Dank an:"
         },
         "music": {
             "title": "Musik",
@@ -55,6 +59,12 @@
             "title": "Soundeffekt (Pixabay)",
             "intro": "Soundeffekt von <author>Samuel F. Johanns</author> auf <pixabay>Pixabay</pixabay>.",
             "license": "Pixabay Content License"
+        },
+        "inspiration": {
+            "title": "Inspiration",
+            "intro": "Der Halloween-Gimick auf dieser Seite ist inspiriert von <author>Neal Agarwal</author> und seinen kreativen, spielerischen Web-Experimenten.",
+            "note": "Interaktive, spielerische Web-Erfahrungen wie „Halloween“ auf neal.fun dienten als Vorbild für den Grusel-Effekt.",
+            "credit": "Vielen Dank an <neal>neal.fun</neal> für die Inspiration – der originale Code stammt selbstverständlich von uns, nur die Idee wurde freundlich „ausgeliehen“."
         }
     },
     "local": {

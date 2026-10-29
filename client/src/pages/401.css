@@ -1,0 +1,132 @@
+/* ---------- 401 Seite ---------- */
+
+.unauthorized {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+/* Hintergrund: Reihen untereinander */
+.unauthorized-bg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.unauthorized-row {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* Laufband */
+.unauthorized-track {
+  display: flex;
+  flex-shrink: 0;
+  width: max-content;
+  will-change: transform;
+  animation-duration: 60s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.unauthorized-track--right { animation-name: unauthorized-right; }
+.unauthorized-track--left  { animation-name: unauthorized-left; }
+
+.unauthorized-item {
+  padding-right: 3rem;
+  font-size: clamp(1.25rem, 3vw, 2rem); /* klein und überall gleich */
+  font-weight: 800;
+  line-height: 1;
+  color: var(--accent);
+  opacity: 0.12;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* -10% von 60 Items = genau 6 Items → nahtlose Schleife */
+@keyframes unauthorized-left {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-10%); }
+}
+
+@keyframes unauthorized-right {
+  from { transform: translateX(-10%); }
+  to   { transform: translateX(0); }
+}
+
+/* Inhalt über dem Hintergrund */
+.unauthorized-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.unauthorized-code {
+  margin: 0;
+  font-size: clamp(6rem, 20vw, 12rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+}
+
+.unauthorized-title {
+  margin: 1rem 0 0;
+  font-size: clamp(1.3rem, 3.4vw, 1.8rem);
+  font-weight: 700;
+}
+
+.unauthorized-btn {
+  display: inline-block;
+  margin-top: 2rem;
+  padding: 0.9rem 2rem;
+  background: var(--accent);
+  color: var(--accent-fg);
+  border: 2px solid var(--accent);
+  border-radius: 14px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.1s, filter 0.15s;
+}
+
+.unauthorized-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+.unauthorized-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 700px) {
+  .unauthorized-title {
+    font-size: 1.05rem;
+  }
+
+  .unauthorized-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+}

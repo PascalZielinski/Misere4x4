@@ -6,7 +6,8 @@
         "tutorial": "Tutorial",
         "serverDown": "Server currently unavailable",
         "licensesCredits": "Licenses & Credits",
-        "admin": "Admin"
+        "admin": "Admin",
+        "rating": "Rating"
     },
     "nav": {
         "language": "Language",
@@ -28,7 +29,10 @@
             "recording": "Recording and production:",
             "arrangement": "Arrangement:",
             "source": "Source:",
-            "license": "License:"
+            "license": "License:",
+            "creator": "Created by:",
+            "inspiration": "Inspiration:",
+            "credit": "Thanks to:"
         },
         "music": {
             "title": "Music",
@@ -55,6 +59,12 @@
             "title": "Sound effect (Pixabay)",
             "intro": "Sound effect by <author>Samuel F. Johanns</author> from <pixabay>Pixabay</pixabay>.",
             "license": "Pixabay Content License"
+        },
+        "inspiration": {
+            "title": "Inspiration",
+            "intro": "The Halloween gimmick on this site is inspired by <author>Neal Agarwal</author> and his playful web experiments.",
+            "note": "Interactive, playful web experiences like “Halloween” on neal.fun served as a reference for the spooky effect.",
+            "credit": "Many thanks to <neal>neal.fun</neal> for the inspiration – the actual code is of course ours, only the idea was kindly “borrowed”."
         }
     },
     "local": {
@@ -157,7 +167,6 @@
         "submit": "Submit",
         "sending": "Sending…",
         "success": "Thank you for your feedback!",
-        "error": "Could not submit your feedback. Please try again.",
-        "rating": "Raiting"
+        "error": "Could not submit your feedback. Please try again."
     }
 }

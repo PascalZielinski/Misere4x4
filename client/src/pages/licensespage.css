@@ -98,3 +98,8 @@
 .license-section a:hover {
   filter: brightness(0.8);
 }
+
+.license-section--inspiration {
+  border-left: 3px solid var(--accent);
+  padding-left: 1rem;
+}

@@ -6,6 +6,7 @@ import {
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from 'react'
+import { Navigate, useParams } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import LocalizedLink from '../components/LocalizedLink'
 import { pickFirstPlayer, type Side } from '../game/firstTurn'
@@ -360,6 +361,17 @@ function AnalogClock({
 /* ------------------------------------------------------------------ */
 
 export default function AdminDashboard() {
+  const { lang } = useParams()
+
+  // Kein Login? → auf Unauthorized umleiten
+  if (!sessionStorage.getItem('adminUser')) {
+    return <Navigate to={`/${lang}/401`} replace />
+  }
+
+  return <AdminDesktop />
+}
+
+function AdminDesktop() {
   const { t } = useTranslation()
   const [name] = useState(
     () => sessionStorage.getItem('adminUser') || 'Administrator',
@@ -374,7 +386,6 @@ export default function AdminDashboard() {
   const [timeOffsetSec, setTimeOffsetSec] = useState(0)
   const [clockOpen, setClockOpen] = useState(false)
 
-  // Z-Reihenfolge
   const [zTop, setZTop] = useState(5)
   const [windowZ, setWindowZ] = useState<Record<string, number>>({
     main: 1,
@@ -387,7 +398,6 @@ export default function AdminDashboard() {
     setZTop((z) => z + 1)
   }
 
-  // Terminal-State
   const [cmdLines, setCmdLines] = useState<string[]>([
     'LouvreOS [Version 1.0.0]',
     '(c) Louvre Systems. Alle Rechte vorbehalten.',
@@ -426,7 +436,6 @@ export default function AdminDashboard() {
     if (!raw) return
     const next = [...cmdLines, `C:\\> ${raw}`]
 
-    // Wenn ein Spiel läuft, zuerst prüfen, ob Input ein Zug ist
     if (game) {
       const moveIndex = parseMove(raw)
       if (moveIndex !== null) {
@@ -565,21 +574,21 @@ export default function AdminDashboard() {
           background: `linear-gradient(180deg, ${sky.top} 0%, ${sky.mid} 45%, ${sky.bot} 100%)`,
         }}
       >
-      <div className="desktop-stars" style={{ opacity: night }}>
-        {STARS.map((s, i) => (
-          <span
-            key={i}
-            className="desktop-star"
-            style={{
-              left: `${s.x}%`,
-              top: `${s.y}%`,
-              width: `${s.size}px`,
-              height: `${s.size}px`,
-              animationDelay: `${s.delay}s`,
-            }}
-          />
-        ))}
-      </div>
+        <div className="desktop-stars" style={{ opacity: night }}>
+          {STARS.map((s, i) => (
+            <span
+              key={i}
+              className="desktop-star"
+              style={{
+                left: `${s.x}%`,
+                top: `${s.y}%`,
+                width: `${s.size}px`,
+                height: `${s.size}px`,
+                animationDelay: `${s.delay}s`,
+              }}
+            />
+          ))}
+        </div>
 
         <span className="desktop-sun" style={{ opacity: 1 - night }} />
         <span className="desktop-moon" style={{ opacity: night }} />

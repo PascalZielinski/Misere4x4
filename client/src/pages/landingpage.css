@@ -124,6 +124,21 @@ button.landing-btn {
   border-bottom-color: var(--accent);
 }
 
+.landing-pumpkin-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+}
+
+.landing-pumpkin-stack > :first-child {
+  margin: 0;
+}
+
+.landing-pumpkin-stack .landing-btn {
+  margin: 0;
+}
+
 @media (max-width: 480px) {
   .site-footer {
     justify-content: center;
