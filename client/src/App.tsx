@@ -1,5 +1,7 @@
-import { createBrowserRouter, Outlet } from "react-router"
+import { createBrowserRouter, Outlet, redirect, type LoaderFunctionArgs } from "react-router"
 import { RouterProvider } from "react-router/dom"
+import i18n from "./i18n"
+import { detectLanguage, isSupported } from "./i18n/languages"
 import LandingPage from "./pages/landingpage"
 import NotFound from "./pages/404"
 import LocalGame from "./pages/localgamepage"
@@ -16,14 +18,38 @@ function RootLayout() {
   )
 }
 
+// "/" -> "/de" bzw. "/en"
+function rootRedirect() {
+  return redirect(`/${detectLanguage()}`)
+}
+
+// "/de/..." prüfen und Sprache setzen
+async function langLoader({ params, request }: LoaderFunctionArgs) {
+  const { lang } = params
+
+  if (!isSupported(lang)) {
+    // z. B. "/local" -> "/de/local"
+    const url = new URL(request.url)
+    return redirect(`/${detectLanguage()}${url.pathname}${url.search}`)
+  }
+
+  if (i18n.language !== lang) {
+    await i18n.changeLanguage(lang)
+  }
+  return null
+}
+
 const router = createBrowserRouter([
+  { path: "/", loader: rootRedirect },
   {
+    path: "/:lang",
+    loader: langLoader,
     element: <RootLayout />,
     children: [
-      { path: "/", element: <LandingPage /> },
-      { path: "/local", element: <LocalGame /> },
-      { path: "/licenses", element: <LicensesPage /> },
-      { path: "/tutorial", element: <TutorialPage /> },
+      { index: true, element: <LandingPage /> },
+      { path: "local", element: <LocalGame /> },
+      { path: "licenses", element: <LicensesPage /> },
+      { path: "tutorial", element: <TutorialPage /> },
       { path: "*", element: <NotFound /> },
     ],
   },

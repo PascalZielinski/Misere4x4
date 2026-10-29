@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import './localgamepage.css'
 import './Tutorialpage.css'
 import NavBar from '../components/NavBar'
@@ -39,40 +40,17 @@ const WIN_PILL_STYLE = {
 
 type Placement = 'above' | 'below' | 'left' | 'right'
 
-interface StepInfo {
-  text: string
-  placement: Placement
-}
-
-const STEPS: StepInfo[] = [
-  {
-    text: 'Hier siehst du, welcher Spieler den nächsten Zug macht.',
-    placement: 'above',
-  },
-  {
-    text: 'Das ist das Spielfeld. Setze deine Markierung auf ein freies Feld. Ziel ist es, eine Dreierreihe zu bilden.',
-    placement: 'below',
-  },
-  {
-    text: 'Hier kannst du jederzeit ein neues Spiel beginnen.',
-    placement: 'below',
-  },
-  {
-    text: 'Die Krone markiert immer den Spieler mit dem höchsten Spielstand. Darunter siehst du die Zug-Historie beider Spieler.',
-    placement: 'left',
-  },
-  {
-    text: 'O setzt auf C4. Dieser Zug vervollständigt noch keine Dreierreihe – das Spiel läuft weiter.',
-    placement: 'above',
-  },
-  {
-    text: 'X setzt auf A4 – damit bildet X die Dreierreihe A4–B3–C2! Wer eine Dreierreihe bildet, verliert. O gewinnt das Spiel!',
-    placement: 'below',
-  },
+const STEP_PLACEMENTS: Placement[] = [
+  'above',
+  'below',
+  'below',
+  'left',
+  'above',
+  'below',
 ]
 
 const FIRST_STEP = 0
-const LAST_STEP = STEPS.length - 1
+const LAST_STEP = STEP_PLACEMENTS.length - 1
 const FINISHED = -1
 
 function getBoardForStep(step: number): (Mark | null)[] {
@@ -89,6 +67,7 @@ interface TooltipStyle extends React.CSSProperties {
 }
 
 export default function TutorialPage() {
+  const { t } = useTranslation()
   const [step, setStep] = useState<number>(FIRST_STEP)
 
   const turnPanelRef = useRef<HTMLDivElement>(null)
@@ -108,7 +87,6 @@ export default function TutorialPage() {
   ]
 
   const active = step >= FIRST_STEP && step <= LAST_STEP
-  const currentStep = active ? STEPS[step] : null
   const showWinning = step >= 5 || step === FINISHED
 
   useEffect(() => {
@@ -130,8 +108,8 @@ export default function TutorialPage() {
     setStep(FINISHED)
   }
 
-  const playerA = 'Spieler A'
-  const playerB = 'Spieler B'
+  const playerA = t('local.playerA')
+  const playerB = t('local.playerB')
   const markA: Mark = 'X'
   const markB: Mark = 'O'
   const scoreA = 1
@@ -165,7 +143,7 @@ export default function TutorialPage() {
 
         {active && (
           <button type="button" className="tutorial-skip" onClick={finish}>
-            Tutorial überspringen
+            {t('tutorial.skip')}
           </button>
         )}
 
@@ -180,9 +158,9 @@ export default function TutorialPage() {
                   className={`turn-panel${step === 0 ? ' tutorial-highlight' : ''}`}
                 >
                   <span className="turn-text">
-                    {step === 4
-                      ? `${playerB} ist am Zug`
-                      : `${playerA} ist am Zug`}
+                    {t('local.playerTurn', {
+                      name: step === 4 ? playerB : playerA,
+                    })}
                   </span>
                   <span className="mark-box" aria-hidden="true">
                     {step === 4 ? markB : markA}
@@ -222,9 +200,11 @@ export default function TutorialPage() {
                       type="button"
                       className={`cell${mark ? ` cell-${mark.toLowerCase()}` : ''}${extra}`}
                       disabled
-                      aria-label={`Feld ${cellLabel(i)}${
-                        mark ? `, belegt mit ${mark}` : ''
-                      }`}
+                      aria-label={
+                        mark
+                          ? t('local.cellTaken', { cell: cellLabel(i), mark })
+                          : t('local.cell', { cell: cellLabel(i) })
+                      }
                     >
                       {mark && <span className="cell-mark">{mark}</span>}
                       {isWinningCell && (
@@ -255,7 +235,7 @@ export default function TutorialPage() {
                 ref={retryRef}
                 type="button"
                 className={`retry-btn${step === 2 ? ' tutorial-highlight' : ''}`}
-                aria-label="Schnellneustart (Tutorial)"
+                aria-label={t('tutorial.quickRestart')}
                 onClick={() => {}}
               >
                 <span
@@ -273,11 +253,15 @@ export default function TutorialPage() {
               className={`panel${step === 3 ? ' tutorial-highlight' : ''}`}
             >
               <header className="panel-title">
-                <span className="mark-box" aria-label={`${playerA} spielt ${markA}`}>{markA}</span>
-                <span className="panel-title-text">
-                  {playerA} vs. {playerB}
+                <span className="mark-box" aria-label={t('local.playsMark', { name: playerA, mark: markA })}>
+                  {markA}
                 </span>
-                <span className="mark-box" aria-label={`${playerB} spielt ${markB}`}>{markB}</span>
+                <span className="panel-title-text">
+                  {t('local.versus', { a: playerA, b: playerB })}
+                </span>
+                <span className="mark-box" aria-label={t('local.playsMark', { name: playerB, mark: markB })}>
+                  {markB}
+                </span>
               </header>
 
               <div className="panel-players">
@@ -296,7 +280,7 @@ export default function TutorialPage() {
               </div>
 
               <div className="panel-moves">
-                <ol className="moves" aria-label={`Züge von ${playerA}`}>
+                <ol className="moves" aria-label={t('local.movesOf', { name: playerA })}>
                   {movesA.map((m, i) => (
                     <li key={i}>
                       <span className="move-nr">{i + 1}.</span>
@@ -304,7 +288,7 @@ export default function TutorialPage() {
                     </li>
                   ))}
                 </ol>
-                <ol className="moves moves-b" aria-label={`Züge von ${playerB}`}>
+                <ol className="moves moves-b" aria-label={t('local.movesOf', { name: playerB })}>
                   {movesB.map((m, i) => (
                     <li key={i}>
                       <span className="move-nr">{i + 1}.</span>
@@ -317,12 +301,12 @@ export default function TutorialPage() {
           </div>
         </div>
 
-        {active && currentStep && activeRef && (
+        {active && activeRef && (
           <TutorialTooltip
             key={step}
             targetRef={activeRef}
-            placement={currentStep.placement}
-            text={currentStep.text}
+            placement={STEP_PLACEMENTS[step]}
+            text={t(`tutorial.step${step + 1}`)}
             isFirst={step === FIRST_STEP}
             isLast={step === LAST_STEP}
             onNext={goNext}
@@ -353,6 +337,7 @@ function TutorialTooltip({
   onNext,
   onBack,
 }: TutorialTooltipProps) {
+  const { t } = useTranslation()
   const tooltipRef = useRef<HTMLDivElement>(null)
   const [style, setStyle] = useState<TooltipStyle>({
     position: 'fixed',
@@ -436,7 +421,7 @@ function TutorialTooltip({
           onClick={onBack}
           disabled={isFirst}
         >
-          Zurück
+          {t('common.back')}
         </button>
         <button
           type="button"
@@ -444,7 +429,7 @@ function TutorialTooltip({
           onClick={onNext}
           autoFocus
         >
-          {isLast ? 'Fertig' : 'Weiter'}
+          {isLast ? t('tutorial.done') : t('tutorial.next')}
         </button>
       </div>
       <span className="tutorial-tooltip-arrow" aria-hidden="true" />

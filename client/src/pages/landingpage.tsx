@@ -1,7 +1,9 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
+import { useTranslation } from 'react-i18next'
 import './landingpage.css'
 import NavBar from '../components/NavBar'
+import LocalizedLink from '../components/LocalizedLink'
 
 const SERVER = import.meta.env.VITE_SERVER as string | undefined
 
@@ -24,6 +26,8 @@ async function pingServer(): Promise<boolean> {
 }
 
 export default function LandingPage() {
+  const { t } = useTranslation()
+  const { lang } = useParams()
   const navigate = useNavigate()
   const [checking, setChecking] = useState(false)
   const [serverDown, setServerDown] = useState(false)
@@ -33,7 +37,7 @@ export default function LandingPage() {
     setServerDown(false)
     const ok = await pingServer()
     setChecking(false)
-    if (ok) navigate('/online')
+    if (ok) navigate(`/${lang}/online`)
     else setServerDown(true)
   }
 
@@ -43,28 +47,27 @@ export default function LandingPage() {
 
       <main className="landing-main">
         <div className="landing-buttons">
-          <Link to="/local" className="landing-btn landing-btn--primary">
-            Lokal spielen
-          </Link>
+          <LocalizedLink to="/local" className="landing-btn landing-btn--primary">
+            {t('landing.playLocal')}
+          </LocalizedLink>
           <button className="landing-btn" onClick={goOnline} disabled={checking}>
-            {checking ? 'Prüfe Server…' : 'Online spielen'}
+            {checking ? t('landing.checkingServer') : t('landing.playOnline')}
           </button>
-          <Link to="/tutorial" className="landing-btn landing-btn--ghost">
-            Tutorial
-          </Link>
+          <LocalizedLink to="/tutorial" className="landing-btn landing-btn--ghost">
+            {t('landing.tutorial')}
+          </LocalizedLink>
         </div>
         {serverDown && (
           <p className="landing-error" role="alert">
-            Server aktuell nicht verfügbar
+            {t('landing.serverDown')}
           </p>
         )}
       </main>
 
-      {/* FOOTER DIREKT HIER */}
       <footer className="site-footer">
-        <Link to="/licenses" className="footer-link">
-          Lizenzen &amp; Credits
-        </Link>
+        <LocalizedLink to="/licenses" className="footer-link">
+          {t('landing.licensesCredits')}
+        </LocalizedLink>
       </footer>
     </div>
   )

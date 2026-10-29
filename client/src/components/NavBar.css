@@ -77,6 +77,34 @@
   cursor: pointer;
 }
 
+/* --- Sprach-Dropdown --- */
+.lang-dropdown {
+  gap: 4px;
+  padding: 6px;
+  min-width: 70px;
+}
+
+.lang-option {
+  padding: 0.4rem 0.9rem;
+  background: transparent;
+  color: var(--nav-fg);
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.lang-option:hover {
+  background: var(--nav-border);
+}
+
+.lang-option--active {
+  color: #f97316; /* orange */
+  font-weight: 700;
+}
+
 /* Dark Mode: Icons invertieren */
 :root[data-theme='dark'] .theme-toggle img,
 :root[data-theme='dark'] .sound-toggle img,

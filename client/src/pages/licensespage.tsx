@@ -1,50 +1,57 @@
-import { Link } from 'react-router'
+import { Trans, useTranslation } from 'react-i18next'
 import NavBar from '../components/NavBar'
+import LocalizedLink from '../components/LocalizedLink'
 import './licensespage.css'
 
 export default function LicensesPage() {
+  const { t } = useTranslation()
+
   return (
     <div className="landing">
       <NavBar />
 
       <main className="landing-main">
         <div className="licenses-card">
-          <h1>Lizenzen &amp; Credits</h1>
+          <h1>{t('licenses.title')}</h1>
 
           {/* --- MUSIK --- */}
           <section className="license-section">
-            <h2>Musik</h2>
+            <h2>{t('licenses.music.title')}</h2>
             <p>
-              <strong>„Rêverie, L. 68“</strong> von Claude Debussy.
+              <Trans i18nKey="licenses.music.intro" components={{ b: <strong /> }} />
             </p>
             <ul>
               <li>
-                <strong>Aufnahme und Produktion:</strong> Gregor Quendel (
+                <strong>{t('licenses.labels.recording')}</strong> Gregor Quendel (
                 <a href="https://www.gregorquendel.com" target="_blank" rel="noopener noreferrer">
                   www.gregorquendel.com
                 </a>
                 )
               </li>
-              <li><strong>Arrangement:</strong> hmscomp</li>
               <li>
-                <strong>Quelle:</strong> Zur Verfügung gestellt von{' '}
+                <strong>{t('licenses.labels.arrangement')}</strong> hmscomp
+              </li>
+              <li>
+                <strong>{t('licenses.labels.source')}</strong> {t('licenses.music.providedBy')}{' '}
                 <a href="https://www.classicals.de" target="_blank" rel="noopener noreferrer">
                   classicals.de
                 </a>
               </li>
-              <li><strong>Lizenz:</strong> Nicht-kommerzielle Nutzung (Creative Commons)</li>
+              <li>
+                <strong>{t('licenses.labels.license')}</strong> {t('licenses.music.license')}
+              </li>
             </ul>
           </section>
 
           {/* --- SOUNDEFFEKTE --- */}
           <section className="license-section">
-            <h2>Soundeffekte</h2>
+            <h2>{t('licenses.sound.title')}</h2>
             <p>
-              <strong>Interface Sounds</strong> von Kenney.
+              <Trans i18nKey="licenses.sound.intro" components={{ b: <strong /> }} />
             </p>
             <ul>
               <li>
-                <strong>Quelle:</strong>{' '}
+                <strong>{t('licenses.labels.source')}</strong>{' '}
                 <a
                   href="https://kenney.nl/assets/interface-sounds"
                   target="_blank"
@@ -53,54 +60,57 @@ export default function LicensesPage() {
                   kenney.nl/assets/interface-sounds
                 </a>
               </li>
-              <li><strong>Lizenz:</strong> Creative Commons CC0 1.0 (Public Domain)</li>
               <li>
-                Die Nutzung ist ohne Namensnennung gestattet. Wir nennen den Urheber
-                dennoch freiwillig zur Anerkennung seiner Arbeit.
+                <strong>{t('licenses.labels.license')}</strong> {t('licenses.sound.license')}
               </li>
+              <li>{t('licenses.sound.note')}</li>
             </ul>
           </section>
 
           {/* --- ICONS & SVGs --- */}
           <section className="license-section">
-            <h2>Icons &amp; SVGs</h2>
+            <h2>{t('licenses.icons.title')}</h2>
             <p>
-              Die auf dieser Seite verwendeten Icons (Sonne, Mond, Lautsprecher,
-              Musiknoten, Retry) stammen von <strong>SVG Repo</strong>.
+              <Trans i18nKey="licenses.icons.intro" components={{ b: <strong /> }} />
             </p>
             <ul>
               <li>
-                <strong>Quelle:</strong>{' '}
+                <strong>{t('licenses.labels.source')}</strong>{' '}
                 <a href="https://www.svgrepo.com/" target="_blank" rel="noopener noreferrer">
                   www.svgrepo.com
                 </a>
               </li>
               <li>
-                <strong>Lizenz:</strong> Die Icons sind unter verschiedenen
-                Open-Source-Lizenzen (z. B. CC0, MIT) verfügbar und für die freie
-                Nutzung in Projekten gedacht.
+                <strong>{t('licenses.labels.license')}</strong> {t('licenses.icons.license')}
               </li>
             </ul>
           </section>
 
           {/* --- AUFGABENSTELLUNG --- */}
           <section className="license-section">
-            <h2>Aufgabenstellung</h2>
+            <h2>{t('licenses.task.title')}</h2>
             <p>
-              Idee, Regeln sowie die Skizze stammen aus der Bewerbungsaufgabe - Drei in einer Reihe.pdf von{' '}
-              <a href="https://www.adesso.de/de/" target="_blank" rel="noopener noreferrer">
-                adesso SE
-              </a>
-              .
+              <Trans
+                i18nKey="licenses.task.text"
+                components={{
+                  adesso: (
+                    <a
+                      href="https://www.adesso.de/de/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    />
+                  ),
+                }}
+              />
             </p>
           </section>
         </div>
       </main>
 
       <footer className="site-footer">
-        <Link to="/" className="footer-link">
-          Zur Startseite
-        </Link>
+        <LocalizedLink to="/" className="footer-link">
+          {t('licenses.backHome')}
+        </LocalizedLink>
       </footer>
     </div>
   )
