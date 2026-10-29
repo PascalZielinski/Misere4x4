@@ -67,6 +67,48 @@ export default function LicensesPage() {
             </ul>
           </section>
 
+          {/* --- PIXABAY SOUNDEFFEKT --- */}
+          <section className="license-section">
+            <h2>{t('licenses.pixabaySound.title')}</h2>
+            <p>
+              <Trans
+                i18nKey="licenses.pixabaySound.intro"
+                components={{
+                  author: (
+                    <a
+                      href="https://pixabay.com/de/users/samuelfjohanns-1207793/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=108930"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    />
+                  ),
+                  pixabay: (
+                    <a
+                      href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=108930"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    />
+                  ),
+                }}
+              />
+            </p>
+            <ul>
+              <li>
+                <strong>{t('licenses.labels.source')}</strong>{' '}
+                <a
+                  href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=108930"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  pixabay.com
+                </a>
+              </li>
+              <li>
+                <strong>{t('licenses.labels.license')}</strong>{' '}
+                {t('licenses.pixabaySound.license')}
+              </li>
+            </ul>
+          </section>
+
           {/* --- ICONS & SVGs --- */}
           <section className="license-section">
             <h2>{t('licenses.icons.title')}</h2>

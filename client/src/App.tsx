@@ -7,6 +7,7 @@ import NotFound from "./pages/404"
 import LocalGame from "./pages/localgamepage"
 import LicensesPage from "./pages/licensespage"
 import TutorialPage from "./pages/Tutorialpage"
+import AdminPage from "./pages/Adminpage"
 import BackgroundMusic from "./components/BackgroundMusic"
 
 function RootLayout() {
@@ -18,17 +19,14 @@ function RootLayout() {
   )
 }
 
-// "/" -> "/de" bzw. "/en"
 function rootRedirect() {
   return redirect(`/${detectLanguage()}`)
 }
 
-// "/de/..." prüfen und Sprache setzen
 async function langLoader({ params, request }: LoaderFunctionArgs) {
   const { lang } = params
 
   if (!isSupported(lang)) {
-    // z. B. "/local" -> "/de/local"
     const url = new URL(request.url)
     return redirect(`/${detectLanguage()}${url.pathname}${url.search}`)
   }
@@ -50,6 +48,7 @@ const router = createBrowserRouter([
       { path: "local", element: <LocalGame /> },
       { path: "licenses", element: <LicensesPage /> },
       { path: "tutorial", element: <TutorialPage /> },
+      { path: "admin", element: <AdminPage />},
       { path: "*", element: <NotFound /> },
     ],
   },

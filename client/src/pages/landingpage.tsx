@@ -65,9 +65,16 @@ export default function LandingPage() {
       </main>
 
       <footer className="site-footer">
-        <LocalizedLink to="/licenses" className="footer-link">
-          {t('landing.licensesCredits')}
-        </LocalizedLink>
+        <div className="site-footer__item site-footer__item--license">
+          <LocalizedLink to="/licenses" className="footer-link">
+            {t('landing.licensesCredits')}
+          </LocalizedLink>
+        </div>
+        <div className="site-footer__item site-footer__item--admin">
+          <LocalizedLink to="/admin" className="footer-link">
+            {t('landing.admin')}
+          </LocalizedLink>
+        </div>
       </footer>
     </div>
   )

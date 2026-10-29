@@ -1,107 +1,127 @@
 {
     "landing": {
-    "playLocal": "Lokal spielen",
-    "playOnline": "Online spielen",
-    "checkingServer": "Prüfe Server…",
-    "tutorial": "Tutorial",
-    "serverDown": "Server aktuell nicht verfügbar",
-    "licensesCredits": "Lizenzen & Credits"
+        "playLocal": "Lokal spielen",
+        "playOnline": "Online spielen",
+        "checkingServer": "Prüfe Server…",
+        "tutorial": "Tutorial",
+        "serverDown": "Server aktuell nicht verfügbar",
+        "licensesCredits": "Lizenzen & Credits",
+        "admin": "Admin"
     },
-    
     "nav": {
-    "language": "Sprache",
-    "audioSettings": "Audioeinstellungen",
-    "soundEffects": "Soundeffekte",
-    "soundVolume": "Lautstärke für Soundeffekte",
-    "music": "Musik",
-    "musicVolume": "Lautstärke für Musik",
-    "toggleTheme": "Darkmode umschalten"
+        "language": "Sprache",
+        "audioSettings": "Audioeinstellungen",
+        "soundEffects": "Soundeffekte",
+        "soundVolume": "Lautstärke für Soundeffekte",
+        "music": "Musik",
+        "musicVolume": "Lautstärke für Musik",
+        "toggleTheme": "Darkmode umschalten"
     },
     "notFound": {
-  "text": "Diese Seite gibt es nicht.",
-  "back": "Zurück zur Startseite"
-},
-"licenses": {
-  "title": "Lizenzen & Credits",
-  "backHome": "Zur Startseite",
-  "labels": {
-    "recording": "Aufnahme und Produktion:",
-    "arrangement": "Arrangement:",
-    "source": "Quelle:",
-    "license": "Lizenz:"
-  },
-  "music": {
-    "title": "Musik",
-    "intro": "<b>„Rêverie, L. 68“</b> von Claude Debussy.",
-    "providedBy": "Zur Verfügung gestellt von",
-    "license": "Nicht-kommerzielle Nutzung (Creative Commons)"
-  },
-  "sound": {
-    "title": "Soundeffekte",
-    "intro": "<b>Interface Sounds</b> von Kenney.",
-    "license": "Creative Commons CC0 1.0 (Public Domain)",
-    "note": "Die Nutzung ist ohne Namensnennung gestattet. Wir nennen den Urheber dennoch freiwillig zur Anerkennung seiner Arbeit."
-  },
-  "icons": {
-    "title": "Icons & SVGs",
-    "intro": "Die auf dieser Seite verwendeten Icons (Sonne, Mond, Lautsprecher, Musiknoten, Retry) stammen von <b>SVG Repo</b>.",
-    "license": "Die Icons sind unter verschiedenen Open-Source-Lizenzen (z. B. CC0, MIT) verfügbar und für die freie Nutzung in Projekten gedacht."
-  },
-  "task": {
-    "title": "Aufgabenstellung",
-    "text": "Idee, Regeln sowie die Skizze stammen aus der Bewerbungsaufgabe - Drei in einer Reihe.pdf von <adesso>adesso SE</adesso>."
-  }
-},
-"local": {
-  "playerA": "Spieler A",
-  "playerB": "Spieler B",
-  "unknown": "unbekannt",
-  "playerTurn": "{{name}} ist am Zug",
-  "lost": "{{name}} hat verloren",
-  "draw": "Unentschieden",
-  "cell": "Feld {{cell}}",
-  "cellTaken": "Feld {{cell}}, belegt mit {{mark}}",
-  "versus": "{{a}} vs. {{b}}",
-  "playsMark": "{{name}} spielt {{mark}}",
-  "movesOf": "Züge von {{name}}",
-  "newOrLoad": "Neues Spiel oder Spiel laden",
-  "rules": {
-    "title": "Spielregeln",
-    "rule1": "Die Spieler setzen abwechselnd ihr Symbol (X oder O) in ein freies Feld.",
-    "rule2": "Wer eine Dreierreihe bildet, verliert die Runde.",
-    "rule3": "Das gilt waagerecht, senkrecht und diagonal.",
-    "rule4": "Sind alle Felder besetzt, ohne dass eine Dreierreihe entstanden ist, endet das Spiel unentschieden.",
-    "sketchAlt": "Skizze aus der Aufgabenstellung: Beispiel für eine Dreierreihe",
-    "adessoAria": "Zur Website von adesso (öffnet in neuem Tab)",
-    "notUnderstood": "Regeln nicht verstanden?"
-  },
-  "result": {
-    "won": "hat gewonnen",
-    "lostLabel": "hat verloren",
-    "scoreAria": "Spielstand",
-    "draws": "Unentschieden: {{count}}",
-    "playAgain": "Erneut spielen"
-  },
-  "menu": {
-    "newGame": "Neues Spiel",
-    "loadGame": "Spiel laden",
-    "versusHint": "{{a}} vs {{b}}",
-    "startedAt": "Gestartet am {{date}}",
-    "firstMove": "Der erste Zug geht an …",
-    "startGame": "Spiel starten",
-    "overwrite": "Das Spiel {{a}} vs {{b}} (gestartet am {{date}}) wird überschrieben."
-  }
-},
-"tutorial": {
-  "skip": "Tutorial überspringen",
-  "next": "Weiter",
-  "done": "Fertig",
-  "quickRestart": "Schnellneustart (Tutorial)",
-  "step1": "Hier siehst du, welcher Spieler den nächsten Zug macht.",
-  "step2": "Das ist das Spielfeld. Setze deine Markierung auf ein freies Feld. Ziel ist es, eine Dreierreihe zu bilden.",
-  "step3": "Hier kannst du jederzeit ein neues Spiel beginnen.",
-  "step4": "Die Krone markiert immer den Spieler mit dem höchsten Spielstand. Darunter siehst du die Zug-Historie beider Spieler.",
-  "step5": "O setzt auf C4. Dieser Zug vervollständigt noch keine Dreierreihe – das Spiel läuft weiter.",
-  "step6": "X setzt auf A4 – damit bildet X die Dreierreihe A4–B3–C2! Wer eine Dreierreihe bildet, verliert. O gewinnt das Spiel!"
-}
+        "text": "Diese Seite gibt es nicht.",
+        "back": "Zurück zur Startseite"
+    },
+    "licenses": {
+        "title": "Lizenzen & Credits",
+        "backHome": "Zur Startseite",
+        "labels": {
+            "recording": "Aufnahme und Produktion:",
+            "arrangement": "Arrangement:",
+            "source": "Quelle:",
+            "license": "Lizenz:"
+        },
+        "music": {
+            "title": "Musik",
+            "intro": "<b>„Rêverie, L. 68“</b> von Claude Debussy.",
+            "providedBy": "Zur Verfügung gestellt von",
+            "license": "Nicht-kommerzielle Nutzung (Creative Commons)"
+        },
+        "sound": {
+            "title": "Soundeffekte",
+            "intro": "<b>Interface Sounds</b> von Kenney.",
+            "license": "Creative Commons CC0 1.0 (Public Domain)",
+            "note": "Die Nutzung ist ohne Namensnennung gestattet. Wir nennen den Urheber dennoch freiwillig zur Anerkennung seiner Arbeit."
+        },
+        "icons": {
+            "title": "Icons & SVGs",
+            "intro": "Die auf dieser Seite verwendeten Icons (Sonne, Mond, Lautsprecher, Musiknoten, Retry) stammen von <b>SVG Repo</b>.",
+            "license": "Die Icons sind unter verschiedenen Open-Source-Lizenzen (z. B. CC0, MIT) verfügbar und für die freie Nutzung in Projekten gedacht."
+        },
+        "task": {
+            "title": "Aufgabenstellung",
+            "text": "Idee, Regeln sowie die Skizze stammen aus der Bewerbungsaufgabe - Drei in einer Reihe.pdf von <adesso>adesso SE</adesso>."
+        },
+        "pixabaySound": {
+            "title": "Soundeffekt (Pixabay)",
+            "intro": "Soundeffekt von <author>Samuel F. Johanns</author> auf <pixabay>Pixabay</pixabay>.",
+            "license": "Pixabay Content License"
+        }
+    },
+    "local": {
+        "playerA": "Spieler A",
+        "playerB": "Spieler B",
+        "unknown": "unbekannt",
+        "playerTurn": "{{name}} ist am Zug",
+        "lost": "{{name}} hat verloren",
+        "draw": "Unentschieden",
+        "cell": "Feld {{cell}}",
+        "cellTaken": "Feld {{cell}}, belegt mit {{mark}}",
+        "versus": "{{a}} vs. {{b}}",
+        "playsMark": "{{name}} spielt {{mark}}",
+        "movesOf": "Züge von {{name}}",
+        "newOrLoad": "Neues Spiel oder Spiel laden",
+        "rules": {
+            "title": "Spielregeln",
+            "rule1": "Die Spieler setzen abwechselnd ihr Symbol (X oder O) in ein freies Feld.",
+            "rule2": "Wer eine Dreierreihe bildet, verliert die Runde.",
+            "rule3": "Das gilt waagerecht, senkrecht und diagonal.",
+            "rule4": "Sind alle Felder besetzt, ohne dass eine Dreierreihe entstanden ist, endet das Spiel unentschieden.",
+            "sketchAlt": "Skizze aus der Aufgabenstellung: Beispiel für eine Dreierreihe",
+            "adessoAria": "Zur Website von adesso (öffnet in neuem Tab)",
+            "notUnderstood": "Regeln nicht verstanden?"
+        },
+        "result": {
+            "won": "hat gewonnen",
+            "lostLabel": "hat verloren",
+            "scoreAria": "Spielstand",
+            "draws": "Unentschieden: {{count}}",
+            "playAgain": "Erneut spielen"
+        },
+        "menu": {
+            "newGame": "Neues Spiel",
+            "loadGame": "Spiel laden",
+            "versusHint": "{{a}} vs {{b}}",
+            "startedAt": "Gestartet am {{date}}",
+            "firstMove": "Der erste Zug geht an …",
+            "startGame": "Spiel starten",
+            "overwrite": "Das Spiel {{a}} vs {{b}} (gestartet am {{date}}) wird überschrieben."
+        }
+    },
+    "tutorial": {
+        "skip": "Tutorial überspringen",
+        "next": "Weiter",
+        "done": "Fertig",
+        "quickRestart": "Schnellneustart (Tutorial)",
+        "step1": "Hier siehst du, welcher Spieler den nächsten Zug macht.",
+        "step2": "Das ist das Spielfeld. Setze deine Markierung auf ein freies Feld. Ziel ist es, eine Dreierreihe zu bilden.",
+        "step3": "Hier kannst du jederzeit ein neues Spiel beginnen.",
+        "step4": "Die Krone markiert immer den Spieler mit dem höchsten Spielstand. Darunter siehst du die Zug-Historie beider Spieler.",
+        "step5": "O setzt auf C4. Dieser Zug vervollständigt noch keine Dreierreihe – das Spiel läuft weiter.",
+        "step6": "X setzt auf A4 – damit bildet X die Dreierreihe A4–B3–C2! Wer eine Dreierreihe bildet, verliert. O gewinnt das Spiel!"
+    },
+    "admin": {
+        "title": "Zugriff beschränkt",
+        "user": "Benutzer",
+        "password": "Passwort",
+        "login": "Anmelden",
+        "denied": "Zugriff verweigert.",
+        "granted": "Zugriff gewährt.",
+        "welcome": "Willkommen, {{user}}.",
+        "back": "Zurück",
+        "3": "Drei in einer Reihe",
+        "start": "Öffne das start menü",
+        "cmd": "Öffne ein cmd fenster",
+        "gamestart": "Schreib 3erReihe -start",
+        "follow": "Folge den anweisungen"
+    }
 }

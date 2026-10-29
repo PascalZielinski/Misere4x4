@@ -1,107 +1,127 @@
 {
     "landing": {
-    "playLocal": "Play locally",
-    "playOnline": "Play online",
-    "checkingServer": "Checking server…",
-    "tutorial": "Tutorial",
-    "serverDown": "Server currently unavailable",
-    "licensesCredits": "Licenses & Credits"
+        "playLocal": "Play locally",
+        "playOnline": "Play online",
+        "checkingServer": "Checking server…",
+        "tutorial": "Tutorial",
+        "serverDown": "Server currently unavailable",
+        "licensesCredits": "Licenses & Credits",
+        "admin": "Admin"
     },
-    
     "nav": {
-    "language": "Language",
-    "audioSettings": "Audio settings",
-    "soundEffects": "Sound effects",
-    "soundVolume": "Sound effects volume",
-    "music": "Music",
-    "musicVolume": "Music volume",
-    "toggleTheme": "Toggle dark mode"
+        "language": "Language",
+        "audioSettings": "Audio settings",
+        "soundEffects": "Sound effects",
+        "soundVolume": "Sound effects volume",
+        "music": "Music",
+        "musicVolume": "Music volume",
+        "toggleTheme": "Toggle dark mode"
     },
     "notFound": {
-  "text": "This page doesn't exist.",
-  "back": "Back to home"
-},
-"licenses": {
-  "title": "Licenses & Credits",
-  "backHome": "Back to home",
-  "labels": {
-    "recording": "Recording and production:",
-    "arrangement": "Arrangement:",
-    "source": "Source:",
-    "license": "License:"
-  },
-  "music": {
-    "title": "Music",
-    "intro": "<b>“Rêverie, L. 68”</b> by Claude Debussy.",
-    "providedBy": "Provided by",
-    "license": "Non-commercial use (Creative Commons)"
-  },
-  "sound": {
-    "title": "Sound effects",
-    "intro": "<b>Interface Sounds</b> by Kenney.",
-    "license": "Creative Commons CC0 1.0 (Public Domain)",
-    "note": "Use without attribution is permitted. We credit the author anyway to acknowledge their work."
-  },
-  "icons": {
-    "title": "Icons & SVGs",
-    "intro": "The icons used on this site (sun, moon, speaker, music notes, retry) come from <b>SVG Repo</b>.",
-    "license": "The icons are available under various open-source licenses (e.g. CC0, MIT) and are intended for free use in projects."
-  },
-  "task": {
-    "title": "Assignment",
-    "text": "The idea, rules and sketch are taken from the application assignment “Drei in einer Reihe.pdf” by <adesso>adesso SE</adesso>."
-  }
-},
-"local": {
-  "playerA": "Player A",
-  "playerB": "Player B",
-  "unknown": "unknown",
-  "playerTurn": "{{name}}'s turn",
-  "lost": "{{name}} has lost",
-  "draw": "Draw",
-  "cell": "Cell {{cell}}",
-  "cellTaken": "Cell {{cell}}, taken by {{mark}}",
-  "versus": "{{a}} vs. {{b}}",
-  "playsMark": "{{name}} plays {{mark}}",
-  "movesOf": "Moves of {{name}}",
-  "newOrLoad": "New game or load game",
-  "rules": {
-    "title": "Rules",
-    "rule1": "Players take turns placing their symbol (X or O) on an empty cell.",
-    "rule2": "Whoever forms a line of three loses the round.",
-    "rule3": "This applies horizontally, vertically and diagonally.",
-    "rule4": "If all cells are filled without a line of three, the game ends in a draw.",
-    "sketchAlt": "Sketch from the assignment: example of a line of three",
-    "adessoAria": "Go to the adesso website (opens in a new tab)",
-    "notUnderstood": "Didn't understand the rules?"
-  },
-  "result": {
-    "won": "has won",
-    "lostLabel": "has lost",
-    "scoreAria": "Score",
-    "draws": "Draws: {{count}}",
-    "playAgain": "Play again"
-  },
-  "menu": {
-    "newGame": "New game",
-    "loadGame": "Load game",
-    "versusHint": "{{a}} vs {{b}}",
-    "startedAt": "Started on {{date}}",
-    "firstMove": "The first move goes to …",
-    "startGame": "Start game",
-    "overwrite": "The game {{a}} vs {{b}} (started on {{date}}) will be overwritten."
-  }
-},
-"tutorial": {
-  "skip": "Skip tutorial",
-  "next": "Next",
-  "done": "Done",
-  "quickRestart": "Quick restart (tutorial)",
-  "step1": "Here you can see which player moves next.",
-  "step2": "This is the board. Place your mark on an empty cell. The goal is to avoid forming a line of three.",
-  "step3": "Here you can start a new game at any time.",
-  "step4": "The crown always marks the player with the highest score. Below it you can see the move history of both players.",
-  "step5": "O plays C4. This move doesn't complete a line of three yet, so the game continues.",
-  "step6": "X plays A4, which forms the line A4–B3–C2! Whoever forms a line of three loses. O wins the game!"
-}
+        "text": "This page doesn't exist.",
+        "back": "Back to home"
+    },
+    "licenses": {
+        "title": "Licenses & Credits",
+        "backHome": "Back to home",
+        "labels": {
+            "recording": "Recording and production:",
+            "arrangement": "Arrangement:",
+            "source": "Source:",
+            "license": "License:"
+        },
+        "music": {
+            "title": "Music",
+            "intro": "<b>“Rêverie, L. 68”</b> by Claude Debussy.",
+            "providedBy": "Provided by",
+            "license": "Non-commercial use (Creative Commons)"
+        },
+        "sound": {
+            "title": "Sound effects",
+            "intro": "<b>Interface Sounds</b> by Kenney.",
+            "license": "Creative Commons CC0 1.0 (Public Domain)",
+            "note": "Use without attribution is permitted. We credit the author anyway to acknowledge their work."
+        },
+        "icons": {
+            "title": "Icons & SVGs",
+            "intro": "The icons used on this site (sun, moon, speaker, music notes, retry) come from <b>SVG Repo</b>.",
+            "license": "The icons are available under various open-source licenses (e.g. CC0, MIT) and are intended for free use in projects."
+        },
+        "task": {
+            "title": "Assignment",
+            "text": "The idea, rules and sketch are taken from the application assignment “Drei in einer Reihe.pdf” by <adesso>adesso SE</adesso>."
+        },
+        "pixabaySound": {
+            "title": "Sound effect (Pixabay)",
+            "intro": "Sound effect by <author>Samuel F. Johanns</author> from <pixabay>Pixabay</pixabay>.",
+            "license": "Pixabay Content License"
+        }
+    },
+    "local": {
+        "playerA": "Player A",
+        "playerB": "Player B",
+        "unknown": "unknown",
+        "playerTurn": "{{name}}'s turn",
+        "lost": "{{name}} has lost",
+        "draw": "Draw",
+        "cell": "Cell {{cell}}",
+        "cellTaken": "Cell {{cell}}, taken by {{mark}}",
+        "versus": "{{a}} vs. {{b}}",
+        "playsMark": "{{name}} plays {{mark}}",
+        "movesOf": "Moves of {{name}}",
+        "newOrLoad": "New game or load game",
+        "rules": {
+            "title": "Rules",
+            "rule1": "Players take turns placing their symbol (X or O) on an empty cell.",
+            "rule2": "Whoever forms a line of three loses the round.",
+            "rule3": "This applies horizontally, vertically and diagonally.",
+            "rule4": "If all cells are filled without a line of three, the game ends in a draw.",
+            "sketchAlt": "Sketch from the assignment: example of a line of three",
+            "adessoAria": "Go to the adesso website (opens in a new tab)",
+            "notUnderstood": "Didn't understand the rules?"
+        },
+        "result": {
+            "won": "has won",
+            "lostLabel": "has lost",
+            "scoreAria": "Score",
+            "draws": "Draws: {{count}}",
+            "playAgain": "Play again"
+        },
+        "menu": {
+            "newGame": "New game",
+            "loadGame": "Load game",
+            "versusHint": "{{a}} vs {{b}}",
+            "startedAt": "Started on {{date}}",
+            "firstMove": "The first move goes to …",
+            "startGame": "Start game",
+            "overwrite": "The game {{a}} vs {{b}} (started on {{date}}) will be overwritten."
+        }
+    },
+    "tutorial": {
+        "skip": "Skip tutorial",
+        "next": "Next",
+        "done": "Done",
+        "quickRestart": "Quick restart (tutorial)",
+        "step1": "Here you can see which player moves next.",
+        "step2": "This is the board. Place your mark on an empty cell. The goal is to avoid forming a line of three.",
+        "step3": "Here you can start a new game at any time.",
+        "step4": "The crown always marks the player with the highest score. Below it you can see the move history of both players.",
+        "step5": "O plays C4. This move doesn't complete a line of three yet, so the game continues.",
+        "step6": "X plays A4, which forms the line A4–B3–C2! Whoever forms a line of three loses. O wins the game!"
+    },
+    "admin": {
+        "title": "Restricted access",
+        "user": "User",
+        "password": "Password",
+        "login": "Authenticate",
+        "denied": "Access denied.",
+        "granted": "Access granted.",
+        "welcome": "Welcome, {{user}}.",
+        "back": "Back",
+        "3": "Three in a row",
+        "start": "Click on the start button",
+        "cmd": "Open a cmd window",
+        "gamestart": "Typ 3erReihe -start",
+        "follow": "Follow the steps"
+    }
 }
