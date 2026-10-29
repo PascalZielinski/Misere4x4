@@ -1,7 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type FormEvent, type CSSProperties } from 'react'
+import { Link } from 'react-router'
 import './localgamepage.css'
 import NavBar from '../components/NavBar'
 import retryUrl from '../assets/retry-svgrepo-com.svg'
+import crown from '../assets/crown-svgrepo-com.svg'
+import sketchUrl from '../assets/Screenshot 2026-10-28 223508.png'
 import { loadGame, saveGame, type SavedGame } from '../utils/localGameStorage'
 import { pickFirstPlayer, useFirstTurnSpin } from '../game/firstTurn'
 import { cellLabel, newGameState, placeAt } from '../game/placement'
@@ -48,17 +51,20 @@ export default function LocalGame() {
   const [nameA, setNameA] = useState('')
   const [nameB, setNameB] = useState('')
 
-  const result = game ? getResult(game) : null
-  const over = result !== null && result.status !== 'playing'
-  const angles = result?.status === 'lost' ? pillAngles(result.chains) : {}
-
-  const ready = nameA.trim() !== '' && nameB.trim() !== ''
-
   const [step, setStep] = useState<'menu' | 'new' | 'spin'>('menu')
   const [pending, setPending] = useState<SavedGame | null>(null)
   const { shown, finished, spin, cancel } = useFirstTurnSpin()
 
   const [isShaking, setIsShaking] = useState(false)
+  const [showResult, setShowResult] = useState(false)
+
+  const result = game ? getResult(game) : null
+  const over = result !== null && result.status !== 'playing'
+
+  const angles: Record<number, number[]> =
+    result?.status === 'lost' ? pillAngles(result.chains) : {}
+
+  const ready = nameA.trim() !== '' && nameB.trim() !== ''
 
   useEffect(() => {
     setIsShaking(false)
@@ -71,7 +77,16 @@ export default function LocalGame() {
     return () => clearTimeout(timer)
   }, [game?.turn, game?.moves.length, over])
 
-  function startNew(e: React.FormEvent) {
+  useEffect(() => {
+    if (!over) {
+      setShowResult(false)
+      return
+    }
+    const t = setTimeout(() => setShowResult(true), 1000)
+    return () => clearTimeout(t)
+  }, [over])
+
+  function startNew(e: FormEvent) {
     e.preventDefault()
     if (!ready) return
     const first = pickFirstPlayer()
@@ -82,6 +97,9 @@ export default function LocalGame() {
       markB: 'O',
       firstPlayer: first,
       ...newGameState(first),
+      scoreA: 0,
+      scoreB: 0,
+      draws: 0,
       startedAt: Date.now(),
     }
     saveGame(next)
@@ -89,23 +107,6 @@ export default function LocalGame() {
     setPending(next)
     setStep('spin')
     spin(next.firstPlayer, () => setGame(next))
-  }
-
-  function fastReset() {
-    if (!game) return
-    setNameA(game.playerA)
-    setNameB(game.playerB)
-    
-    const first = pickFirstPlayer()
-    const next: SavedGame = {
-      ...game,
-      firstPlayer: first,
-      ...newGameState(first),
-      startedAt: Date.now(),
-    }
-    saveGame(next)
-    setSaved(next)
-    setGame(next)
   }
 
   function loadSaved() {
@@ -117,7 +118,7 @@ export default function LocalGame() {
 
   function handleCell(index: number) {
     if (!game || over) return
-    const next = placeAt(game, index)
+    let next = placeAt(game, index)
     if (!next) {
       playBlocked()
       return
@@ -126,10 +127,50 @@ export default function LocalGame() {
     const placedMark = next.board[index]
     play(placedMark === 'X' ? dropXSound : dropOSound)
 
+    const outcome = getResult(next)
+    if (outcome.status === 'lost') {
+      const winner = outcome.loser === 'A' ? 'B' : 'A'
+      next = {
+        ...next,
+        scoreA: next.scoreA + (winner === 'A' ? 1 : 0),
+        scoreB: next.scoreB + (winner === 'B' ? 1 : 0),
+      }
+    } else if (outcome.status === 'draw') {
+      next = { ...next, draws: next.draws + 1 }
+    }
+
     saveGame(next)
     setSaved(next)
     setGame(next)
   }
+
+  function playAgain() {
+    if (!game) return
+    const first = pickFirstPlayer()
+    const next: SavedGame = {
+      ...game,
+      firstPlayer: first,
+      ...newGameState(first),
+      startedAt: Date.now(),
+    }
+    saveGame(next)
+    setSaved(next)
+    setPending(next)
+    setShowResult(false)
+    setGame(null)
+    setStep('spin')
+    spin(first, () => setGame(next))
+  }
+
+  const winnerSide = result?.status === 'lost' ? (result.loser === 'A' ? 'B' : 'A') : null
+
+  const leaderSide: 'A' | 'B' | null = !game
+  ? null
+  : game.scoreA > game.scoreB
+    ? 'A'
+    : game.scoreB > game.scoreA
+      ? 'B'
+      : null
 
   function handleCellHover(index: number) {
     if (!game || over || game.board[index] !== null) return
@@ -169,8 +210,34 @@ export default function LocalGame() {
       <NavBar />
 
       <main className="game-main">
-        <div className="game-row">
+        <aside className="rules-panel">
+          <header className="rules-header">Spielregeln</header>
+          <ul className="rules-list">
+            <li>Die Spieler setzen abwechselnd ihr Symbol (X oder O) in ein freies Feld.</li>
+            <li>Wer eine Dreierreihe bildet, verliert die Runde.</li>
+            <li>Das gilt waagerecht, senkrecht und diagonal.</li>
+            <li>Sind alle Felder besetzt, ohne dass eine Dreierreihe entstanden ist, endet das Spiel unentschieden.</li>
+          </ul>
+            <figure className="rules-sketch">
+              <a
+                href="https://www.adesso.de/de/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rules-sketch-link"
+                aria-label="Zur Website von adesso (öffnet in neuem Tab)"
+              >
+                <img
+                  src={sketchUrl}
+                  alt="Skizze aus der Aufgabenstellung: Beispiel für eine Dreierreihe"
+                />
+              </a>
+            </figure>
+          <Link to="/tutorial" className="rules-link">
+            Regeln nicht verstanden?
+          </Link>
+        </aside>
 
+        <div className="game-row">
           <div className="board-col">
             <div className="board-area">
               <div />
@@ -196,15 +263,15 @@ export default function LocalGame() {
                 {Array.from({ length: ROWS.length * COLS.length }).map((_, i) => {
                   const mark = game?.board[i] ?? null
                   return (
-                      <button
-                        key={i}
-                        className={`cell${mark ? ` cell-${mark.toLowerCase()}` : ''}`}
-                        onClick={() => handleCell(i)}
-                        onMouseEnter={() => handleCellHover(i)}
-                        disabled={!game || over}
-                        aria-disabled={mark !== null}
-                        aria-label={`Feld ${cellLabel(i)}${mark ? `, belegt mit ${mark}` : ''}`}
-                      >
+                    <button
+                      key={i}
+                      className={`cell${mark ? ` cell-${mark.toLowerCase()}` : ''}`}
+                      onClick={() => handleCell(i)}
+                      onMouseEnter={() => handleCellHover(i)}
+                      disabled={!game || over}
+                      aria-disabled={mark !== null}
+                      aria-label={`Feld ${cellLabel(i)}${mark ? `, belegt mit ${mark}` : ''}`}
+                    >
                       {mark && <span className="cell-mark">{mark}</span>}
                       {(angles[i] ?? []).map((a, k) => (
                         <span
@@ -215,7 +282,7 @@ export default function LocalGame() {
                             {
                               '--angle': `${a}deg`,
                               '--len': a % 90 === 0 ? '72%' : '100%',
-                            } as React.CSSProperties
+                            } as CSSProperties
                           }
                         />
                       ))}
@@ -235,7 +302,6 @@ export default function LocalGame() {
           </div>
 
           <div className="panel-wrap">
-            {/* NEU: Container für die Buttons oben rechts */}
             <div className="panel-top-actions">
               <button className="retry-btn" onClick={openMenu} aria-label="Neues Spiel oder Spiel laden">
                 <span
@@ -246,11 +312,6 @@ export default function LocalGame() {
                   }}
                 />
               </button>
-              {game && (
-                <button className="fast-reset-btn" onClick={fastReset} aria-label="Schnellneustart">
-                  Fast Reset
-                </button>
-              )}
             </div>
 
             <aside className="panel">
@@ -262,10 +323,20 @@ export default function LocalGame() {
                 <span className="mark-box" aria-label={`${playerB} spielt ${markB}`}>{markB}</span>
               </header>
 
-              <div className="panel-players">
-                <span className="player-name">{playerA}</span>
-                <span className="player-name">{playerB}</span>
-              </div>
+                <div className="panel-players">
+                  <span className="player-name">
+                    {leaderSide === 'A' && (
+                      <img src={crown} alt="" aria-hidden="true" className="panel-crown" />
+                    )}
+                    {playerA}
+                  </span>
+                  <span className="player-name">
+                    {playerB}
+                    {leaderSide === 'B' && (
+                      <img src={crown} alt="" aria-hidden="true" className="panel-crown" />
+                    )}
+                  </span>
+                </div>
 
               <div className="panel-moves">
                 <ol className="moves" aria-label={`Züge von ${playerA}`}>
@@ -293,6 +364,82 @@ export default function LocalGame() {
           </div>
         </div>
       </main>
+
+      {showResult && game && result && result.status !== 'playing' && (
+        <div className="result-overlay">
+          <div className="result-card" role="dialog" aria-modal="true">
+            {winnerSide ? (
+              <>
+                <div className="result-winner">
+                  <div className="crown-slot" aria-hidden="true">
+                    {leaderSide && leaderSide === winnerSide && (
+                      <img src={crown} alt="" className="crown-img" />
+                    )}
+                  </div>
+                  <span className="result-winner-name">
+                    {winnerSide === 'A' ? playerA : playerB}
+                  </span>
+                  <span className="result-label">hat gewonnen</span>
+                </div>
+                <div className="result-loser">
+                  <span className="result-loser-name">
+                    {winnerSide === 'A' ? playerB : playerA}
+                  </span>
+                  <span className="result-label">hat verloren</span>
+                </div>
+              </>
+            ) : (
+              <div className="result-draw">
+                <span className="result-draw-title">Unentschieden</span>
+                <span className="result-draw-names">{playerA} &amp; {playerB}</span>
+              </div>
+            )}
+
+              <div className="result-score" aria-label="Spielstand">
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                  }}
+                >
+                  {playerA}
+                  {leaderSide === 'A' && (
+                    <img
+                      src={crown}
+                      alt=""
+                      aria-hidden="true"
+                      style={{ width: '1.1em', height: '1.1em', display: 'inline-block' }}
+                    />
+                  )}
+                </span>
+                <strong>{game.scoreA} : {game.scoreB}</strong>
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                  }}
+                >
+                  {playerB}
+                  {leaderSide === 'B' && (
+                    <img
+                      src={crown}
+                      alt=""
+                      aria-hidden="true"
+                      style={{ width: '1.1em', height: '1.1em', display: 'inline-block' }}
+                    />
+                  )}
+                </span>
+                {game.draws > 0 && <em>Unentschieden: {game.draws}</em>}
+              </div>
+
+            <button className="ov-btn ov-btn-primary" onClick={playAgain} autoFocus>
+              Erneut spielen
+            </button>
+          </div>
+        </div>
+      )}
 
       {!game && (
         <div className="overlay">

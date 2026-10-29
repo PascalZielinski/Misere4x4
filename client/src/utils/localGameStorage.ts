@@ -15,7 +15,12 @@ export type SavedGame = {
   board: (Mark | null)[]
   moves: Move[]
   startedAt: number | null
+  scoreA: number
+  scoreB: number
+  draws: number
 }
+
+const num = (v: unknown) => (Number.isInteger(v) && (v as number) >= 0 ? (v as number) : 0)
 
 function parseBoard(raw: unknown): (Mark | null)[] {
   if (Array.isArray(raw) && raw.length === 16) {
@@ -56,6 +61,9 @@ export function loadGame(): SavedGame | null {
         board: parseBoard(parsed.board),
         moves: parseMoves(parsed.moves),
         startedAt: typeof parsed.startedAt === 'number' ? parsed.startedAt : null,
+        scoreA: num(parsed.scoreA),
+        scoreB: num(parsed.scoreB),
+        draws: num(parsed.draws),
       }
     }
     return null

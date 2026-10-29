@@ -1,0 +1,64 @@
+/* ---------- 404 Seite ---------- */
+
+.not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.not-found h1 {
+  margin: 0;
+  font-size: clamp(6rem, 20vw, 12rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+}
+
+.not-found p {
+  margin: 1rem 0 2rem;
+  font-size: 1.25rem;
+  opacity: 0.75;
+}
+
+.not-found a {
+  display: inline-block;
+  padding: 0.9rem 2rem;
+  background: var(--accent);
+  color: var(--accent-fg);
+  border: 2px solid var(--accent);
+  border-radius: 14px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.1s, filter 0.15s;
+}
+
+.not-found a:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+.not-found a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 700px) {
+  .not-found p {
+    font-size: 1.05rem;
+  }
+
+  .not-found a {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+}

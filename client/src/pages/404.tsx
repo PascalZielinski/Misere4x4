@@ -3,7 +3,7 @@ import './404.css'
 
 export default function NotFound() {
   return (
-    <div>
+    <div className="not-found">
       <h1>404</h1>
       <p>Diese Seite gibt es nicht.</p>
       <Link to="/">Zurück zur Startseite</Link>

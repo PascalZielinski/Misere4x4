@@ -49,6 +49,9 @@ export default function LandingPage() {
           <button className="landing-btn" onClick={goOnline} disabled={checking}>
             {checking ? 'Prüfe Server…' : 'Online spielen'}
           </button>
+          <Link to="/tutorial" className="landing-btn landing-btn--ghost">
+            Tutorial
+          </Link>
         </div>
         {serverDown && (
           <p className="landing-error" role="alert">
