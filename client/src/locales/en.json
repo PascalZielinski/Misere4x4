@@ -168,5 +168,12 @@
         "sending": "Sending…",
         "success": "Thank you for your feedback!",
         "error": "Could not submit your feedback. Please try again."
-    }
+    },
+    "freesoundSound": {
+        "title": "Sound Effect (freesound_community)",
+        "intro": "Sound Effect by <author>freesound_community</author> from <pixabay>Pixabay</pixabay>.",
+        "license": "Pixabay Content License",
+        "thanks": "Say “thanks” to freesound_community! This helps keep the creative spirit going!",
+        "licenseNote": "By downloading, you agree to our <license>License</license>."
+        }
 }

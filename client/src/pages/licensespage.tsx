@@ -109,6 +109,73 @@ export default function LicensesPage() {
             </ul>
           </section>
 
+          {/* --- FREESOUND_COMMUNITY SOUNDEFFEKT --- */}
+          <section className="license-section">
+            <h2>{t('licenses.freesoundSound.title')}</h2>
+            <p>
+              <Trans
+                i18nKey="licenses.freesoundSound.intro"
+                components={{
+                  author: (
+                    <a
+                      href="https://pixabay.com/users/freesound_community-46691455/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    />
+                  ),
+                  pixabay: (
+                    <a
+                      href="https://pixabay.com/sound-effects/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    />
+                  ),
+                }}
+              />
+            </p>
+            <ul>
+              <li>
+                <strong>{t('licenses.labels.creator')}</strong>{' '}
+                <a
+                  href="https://pixabay.com/users/freesound_community-46691455/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  freesound_community
+                </a>
+              </li>
+              <li>
+                <strong>{t('licenses.labels.source')}</strong>{' '}
+                <a
+                  href="https://pixabay.com/sound-effects/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  pixabay.com
+                </a>
+              </li>
+              <li>
+                <strong>{t('licenses.labels.license')}</strong>{' '}
+                {t('licenses.freesoundSound.license')}
+              </li>
+              <li>{t('licenses.freesoundSound.thanks')}</li>
+              <li>
+                <Trans
+                  i18nKey="licenses.freesoundSound.licenseNote"
+                  components={{
+                    license: (
+                      <a
+                        href="https://pixabay.com/service/license-summary/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      />
+                    ),
+                  }}
+                />
+              </li>
+            </ul>
+          </section>
+
           {/* --- ICONS & SVGs --- */}
           <section className="license-section">
             <h2>{t('licenses.icons.title')}</h2>

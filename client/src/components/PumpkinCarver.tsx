@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next'
 import pumpkinSkin from '../assets/pumpkin1.png'
 import pumpkinGlow from '../assets/pumpkin2.png'
 import knifeSrc from '../assets/knife.svg'
+import carveSoundSrc from '../assets/freesound_community-slicing-80796.mp3'
+import { getSoundGain } from '../utils/audioSettings'
 import './PumpkinCarver.css'
 
 type Point = { x: number; y: number }
@@ -22,11 +24,47 @@ const KNIFE_HOTSPOT: Point = {
   y: (KNIFE_SIZE * 60) / 64,
 }
 
-function playCarveSound() {
+const CARVE_VOLUME = 0.2
 
+let carveAudio: HTMLAudioElement | null = null
+
+function getCarveAudio(): HTMLAudioElement {
+  if (!carveAudio) {
+    carveAudio = new Audio(carveSoundSrc)
+    carveAudio.preload = 'auto'
+    carveAudio.loop = false
+  }
+  return carveAudio
 }
-function playShapeRemovedSound() {
 
+function preloadCarveSound() {
+
+  getCarveAudio()
+}
+
+function playCarveSound() {
+  const gain = getSoundGain()
+  if (gain <= 0) return
+  try {
+    const audio = getCarveAudio()
+
+    if (!audio.paused) return
+    audio.volume = Math.min(1, CARVE_VOLUME * gain)
+    audio.currentTime = 0
+    const p = audio.play()
+    if (p && typeof p.catch === 'function') p.catch(() => {})
+  } catch {
+
+  }
+}
+
+function pauseCarveSound() {
+  if (!carveAudio) return
+  try {
+    carveAudio.pause()
+  } catch {
+
+  }
 }
 
 function readSaved(): string | null {
@@ -75,6 +113,7 @@ export default function PumpkinCarver() {
 
   useEffect(() => {
     if (!open || !canvasRef.current) return
+    preloadCarveSound()
     let cancelled = false
     paint(canvasRef.current, readSaved() ?? pumpkinSkin, () => cancelled)
     return () => {
@@ -92,6 +131,7 @@ export default function PumpkinCarver() {
   }, [open])
 
   const close = () => {
+    pauseCarveSound()
     setKnifeVisible(false)
     setOpen(false)
   }
@@ -109,6 +149,7 @@ export default function PumpkinCarver() {
   }
 
   const retry = () => {
+    pauseCarveSound()
     try {
       localStorage.removeItem(STORAGE_KEY)
     } catch {
@@ -166,7 +207,6 @@ export default function PumpkinCarver() {
       ctx.closePath()
       ctx.fill()
       ctx.stroke()
-      playShapeRemovedSound()
     } else {
       ctx.stroke()
     }
@@ -208,6 +248,7 @@ export default function PumpkinCarver() {
   const onUp = () => {
     if (!drawing.current) return
     drawing.current = false
+    pauseCarveSound()
     applyCut(points.current)
     points.current = []
     clearPreview()
@@ -303,7 +344,6 @@ export default function PumpkinCarver() {
           draggable={false}
           style={{
             display: 'block',
-            filter: 'drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff)',
           }}
         />
       </div>
