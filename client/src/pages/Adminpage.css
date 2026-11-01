@@ -849,6 +849,8 @@ repeating-linear-gradient(
   font-size: 0.82rem;
   line-height: 1.55;
   white-space: pre-wrap;
+  user-select: text;
+  cursor: text;
 }
 
 .desktop-window-body--cmd {
@@ -1238,6 +1240,33 @@ button.desktop-tray:focus-visible {
 
 .desktop-clock-btn--ghost:hover {
   background: #eef4fc;
+}
+
+.desktop-window.desktop-window--folder {
+  width: min(40rem, calc(100vw - 2rem));
+}
+.desktop-window.desktop-window--txt {
+  width: min(36rem, calc(100vw - 2rem));
+}
+.desktop-window.desktop-window--cmd {
+  width: min(48rem, calc(100vw - 2rem));
+}
+
+.desktop-window--folder .desktop-explorer-grid {
+  min-height: 18rem;
+  align-content: flex-start;
+}
+.desktop-window--txt .desktop-notepad {
+  min-height: 20rem;
+  font-size: 0.9rem;
+}
+.desktop-window--cmd .desktop-cmd-output {
+  min-height: 22rem;
+  max-height: 26rem;
+  font-size: 0.85rem;
+}
+.desktop-window--cmd .desktop-cmd-form {
+  font-size: 0.85rem;
 }
 
 @media (prefers-reduced-motion: reduce) {

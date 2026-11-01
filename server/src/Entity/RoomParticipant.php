@@ -5,6 +5,12 @@ namespace App\Entity;
 use App\Repository\RoomParticipantRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+#[ORM\Table(
+    uniqueConstraints: [
+        new ORM\UniqueConstraint(name: 'UNIQ_ROOM_PARTICIPANT_SIDE', columns: ['room_id', 'side']),
+        new ORM\UniqueConstraint(name: 'UNIQ_ROOM_PARTICIPANT_USER', columns: ['room_id', 'name_id']),
+    ],
+)]
 #[ORM\Entity(repositoryClass: RoomParticipantRepository::class)]
 class RoomParticipant
 {
@@ -14,13 +20,15 @@ class RoomParticipant
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'roomParticipants')]
-    private ?Room $Room = null;
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?Room $room = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    private ?User $name = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(name: 'name_id', nullable: false, onDelete: 'CASCADE')]
+    private ?User $user = null;
 
-    #[ORM\Column]
-    private ?int $PrivateRoomId = null;
+    #[ORM\Column(length: 1)]
+    private string $side = 'A';
 
     public function getId(): ?int
     {
@@ -29,36 +37,36 @@ class RoomParticipant
 
     public function getRoom(): ?Room
     {
-        return $this->Room;
+        return $this->room;
     }
 
-    public function setRoom(?Room $Room): static
+    public function setRoom(Room $Room): static
     {
-        $this->Room = $Room;
+        $this->room = $Room;
 
         return $this;
     }
 
-    public function getName(): ?User
+    public function getUser(): ?User
     {
-        return $this->name;
+        return $this->user;
     }
 
-    public function setName(?User $name): static
+    public function setUser(?User $user): static
     {
-        $this->name = $name;
+        $this->user = $user;
 
         return $this;
     }
 
-    public function getPrivateRoomId(): ?int
+    public function getSide(): string
     {
-        return $this->PrivateRoomId;
+        return $this->side;
     }
 
-    public function setPrivateRoomId(int $PrivateRoomId): static
+    public function setSide(string $side): static
     {
-        $this->PrivateRoomId = $PrivateRoomId;
+        $this->side = $side;
 
         return $this;
     }

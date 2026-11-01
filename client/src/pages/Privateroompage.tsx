@@ -4,10 +4,11 @@ import { useTranslation } from 'react-i18next'
 import './Privateroompage.css'
 import NavBar from '../components/NavBar'
 import LocalizedLink from '../components/LocalizedLink'
+import { createRoom, joinRoom, PrivateRoomApiError } from '../api/privateRooms'
 
 const CODE_LENGTH = 4
 
-type JoinError = 'invalid' | 'notFound' | 'generic' | null
+type JoinError = 'invalid' | 'notFound' | 'unauthorized' | 'generic' | null
 type Busy = 'creating' | 'joining' | null
 
 export default function PrivateRoomPage() {
@@ -18,19 +19,18 @@ export default function PrivateRoomPage() {
   const [code, setCode] = useState('')
   const [focused, setFocused] = useState(false)
   const [joinError, setJoinError] = useState<JoinError>(null)
-  const [createFailed, setCreateFailed] = useState(false)
+  const [createFailed, setCreateFailed] = useState<'unauthorized' | 'generic' | null>(null)
   const [busy, setBusy] = useState<Busy>(null)
 
   const onCreateRoom = async () => {
     if (busy) return
     setBusy('creating')
-    setCreateFailed(false)
+    setCreateFailed(null)
     try {
-      // TODO: Raum am Server anlegen, Code zurückbekommen
-      // const { code } = await createRoom()
-      navigate(`/${lang}/online/private/room`)
-    } catch {
-      setCreateFailed(true)
+      const room = await createRoom()
+      navigate(`/${lang}/online/private/room/${room.code}`)
+    } catch (error) {
+      setCreateFailed(error instanceof PrivateRoomApiError && error.status === 401 ? 'unauthorized' : 'generic')
       setBusy(null)
     }
   }
@@ -45,12 +45,16 @@ export default function PrivateRoomPage() {
     setJoinError(null)
     setBusy('joining')
     try {
-      // TODO: Beitritt am Server anfragen
-      // const ok = await joinRoom(code)
-      // if (!ok) { setJoinError('notFound'); setBusy(null); return }
-      navigate(`/${lang}/online/private/room/${code}`)
-    } catch {
-      setJoinError('generic')
+      const room = await joinRoom(code)
+      navigate(`/${lang}/online/private/room/${room.code}`)
+    } catch (error) {
+      setJoinError(
+        error instanceof PrivateRoomApiError && error.status === 404
+          ? 'notFound'
+          : error instanceof PrivateRoomApiError && error.status === 401
+            ? 'unauthorized'
+            : 'generic',
+      )
       setBusy(null)
     }
   }
@@ -93,8 +97,11 @@ export default function PrivateRoomPage() {
 
               {createFailed && (
                 <p className="private-room__error" role="alert">
-                  {t('privateRoom.generic')}
+                  {t(`privateRoom.${createFailed}`)}
                 </p>
+              )}
+              {createFailed === 'unauthorized' && (
+                <LocalizedLink to="/online">{t('privateRoom.goOnline')}</LocalizedLink>
               )}
             </section>
 
@@ -170,6 +177,9 @@ export default function PrivateRoomPage() {
                 <p className="private-room__error" role="alert">
                   {t(`privateRoom.${joinError}`)}
                 </p>
+              )}
+              {joinError === 'unauthorized' && (
+                <LocalizedLink to="/online">{t('privateRoom.goOnline')}</LocalizedLink>
               )}
 
               <button

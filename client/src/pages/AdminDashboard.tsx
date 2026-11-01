@@ -117,6 +117,71 @@ function createFreshGame(first: Side): SavedGame {
   } as SavedGame
 }
 
+/* ---------- Fake-Terminal: Download / Installation ---------- */
+
+type Step = { line: string; wait: number; replace?: boolean }
+
+const REPO = '3erReihe'
+const INSTALL_KEY = 'projectInstalled'
+
+const FAKE_PACKAGES = [
+  'react', 'react-dom', 'react-router', 'react-i18next',
+  'i18next', 'typescript', 'vite', '@vitejs/plugin-react',
+]
+
+function readInstalled(): boolean {
+  try {
+    return sessionStorage.getItem(INSTALL_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+function writeInstalled() {
+  try {
+    sessionStorage.setItem(INSTALL_KEY, '1')
+  } catch {
+    /* sessionStorage nicht verfügbar */
+  }
+}
+
+function bar(label: string, p: number): string {
+  const n = 20
+  const filled = Math.round(p * n)
+  return `${label} [${'#'.repeat(filled)}${'.'.repeat(n - filled)}] ${Math.round(p * 100)}%`
+}
+
+// Ein Ladebalken, der in einer Zeile hochzählt (replace = letzte Zeile überschreiben)
+function progress(label: string, steps = 10, wait = 110): Step[] {
+  const out: Step[] = [{ line: bar(label, 0), wait: 150 }]
+  for (let i = 1; i <= steps; i++) {
+    out.push({ line: bar(label, i / steps), wait, replace: true })
+  }
+  return out
+}
+
+function installSteps(): Step[] {
+  return [
+    { line: 'Pakete werden aufgelöst...', wait: 400 },
+    ...progress('Lade Pakete', 14, 140),
+    ...FAKE_PACKAGES.map((p) => ({ line: `+ ${p}`, wait: 120 })),
+    { line: '', wait: 200 },
+    { line: 'added 214 packages, and audited 215 packages in 6s', wait: 400 },
+    { line: 'found 0 vulnerabilities', wait: 100 },
+  ]
+}
+
+const README_TEXT = [
+  '3erReihe – Projekt starten',
+  '',
+  '1. CMD öffnen',
+  '2. git clone https://github.com/PascalZielinski/Misere4x4.git 3erReihe',
+  '3. cd 3erReihe',
+  '4. 3erReihe -start',
+].join('\n')
+
+/* ---------- Fenster ---------- */
+
 type WindowKind = 'default' | 'folder' | 'txt' | 'cmd'
 
 function DraggableWindow({
@@ -165,7 +230,7 @@ function DraggableWindow({
 
   return (
     <section
-      className={`desktop-window${dragging ? ' is-dragging' : ''}`}
+      className={`desktop-window desktop-window--${kind}${dragging ? ' is-dragging' : ''}`}
       style={{
         transform: `translate(calc(-50% + ${offset.x}px), calc(-50% + ${offset.y}px))`,
         zIndex,
@@ -360,7 +425,6 @@ function AdminDesktop() {
     () => sessionStorage.getItem('adminUser') || 'Administrator',
   )
 
-  const [open, setOpen] = useState(true)
   const [folderOpen, setFolderOpen] = useState(false)
   const [readmeOpen, setReadmeOpen] = useState(false)
   const [cmdOpen, setCmdOpen] = useState(false)
@@ -385,7 +449,7 @@ function AdminDesktop() {
     'LouvreOS [Version 1.0.0]',
     '(c) Louvre Systems. Alle Rechte vorbehalten.',
     '',
-    'Tippe "3erReihe -start" um zu beginnen.',
+    'Anleitung: siehe README.txt',
     'Tippe "help" für alle Befehle.',
     '',
   ])
@@ -393,10 +457,25 @@ function AdminDesktop() {
   const [game, setGame] = useState<SavedGame | null>(null)
   const cmdOutputRef = useRef<HTMLDivElement>(null)
 
+  const [cwd, setCwd] = useState('C:\\')
+  const [installed, setInstalled] = useState(readInstalled)
+  const [busy, setBusy] = useState(false)
+  const cmdInputRef = useRef<HTMLInputElement>(null)
+  const timers = useRef<number[]>([])
+
   useEffect(() => {
     const id = window.setInterval(() => setNow(new Date()), 1000)
     return () => window.clearInterval(id)
   }, [])
+
+  useEffect(() => {
+    const list = timers.current
+    return () => list.forEach((id) => window.clearTimeout(id))
+  }, [])
+
+  useEffect(() => {
+    if (!busy) cmdInputRef.current?.focus()
+  }, [busy])
 
   useEffect(() => {
     if (!startOpen) return
@@ -413,11 +492,104 @@ function AdminDesktop() {
     }
   }, [cmdLines])
 
+  const play = (steps: Step[], onDone?: () => void) => {
+    setBusy(true)
+    let tt = 0
+    for (const s of steps) {
+      tt += s.wait
+      timers.current.push(
+        window.setTimeout(() => {
+          setCmdLines((prev) =>
+            s.replace ? [...prev.slice(0, -1), s.line] : [...prev, s.line],
+          )
+        }, tt),
+      )
+    }
+    timers.current.push(
+      window.setTimeout(() => {
+        setCmdLines((prev) => [...prev, ''])
+        onDone?.()
+        setBusy(false)
+      }, tt + 100),
+    )
+  }
+
+  const markInstalled = () => {
+    writeInstalled()
+    setInstalled(true)
+  }
+
+  const fakeCommand = (lower: string): { steps: Step[]; done?: () => void } | null => {
+    const inRepo = cwd !== 'C:\\'
+
+    if (/^git clone\s+\S+/.test(lower)) {
+      return {
+        steps: [
+          { line: `Cloning into '${REPO}'...`, wait: 300 },
+          { line: 'remote: Enumerating objects: 412, done.', wait: 500 },
+          { line: 'remote: Counting objects: 100% (412/412), done.', wait: 300 },
+          ...progress('Receiving objects', 12, 130),
+          ...progress('Resolving deltas ', 6, 100),
+          { line: '', wait: 200 },
+          ...installSteps(),
+        ],
+        done: markInstalled,
+      }
+    }
+
+    if (/^cd\s+\.\.$/.test(lower)) {
+      return { steps: [], done: () => setCwd('C:\\') }
+    }
+
+    if (/^cd\s+3erreihe$/.test(lower)) {
+      if (!installed) {
+        return {
+          steps: [{ line: 'Der angegebene Pfad wurde nicht gefunden.', wait: 150 }],
+        }
+      }
+      return { steps: [], done: () => setCwd(`C:\\${REPO}`) }
+    }
+
+    if (/^npm (install|i)$/.test(lower)) {
+      if (!inRepo) {
+        return {
+          steps: [
+            { line: 'npm error code ENOENT', wait: 300 },
+            { line: 'npm error package.json wurde nicht gefunden.', wait: 100 },
+          ],
+        }
+      }
+      return { steps: installSteps(), done: markInstalled }
+    }
+
+    if (lower === 'npm run dev') {
+      if (!inRepo) {
+        return {
+          steps: [{ line: 'npm error package.json wurde nicht gefunden.', wait: 200 }],
+        }
+      }
+      return {
+        steps: [
+          { line: `> ${REPO.toLowerCase()}@0.0.0 dev`, wait: 300 },
+          { line: '> vite', wait: 100 },
+          { line: '', wait: 400 },
+          { line: '  VITE ready in 412 ms', wait: 600 },
+          { line: '', wait: 50 },
+          { line: '  ➜  Local:   http://localhost:5173/', wait: 100 },
+          { line: '  ➜  Tipp: "3erReihe -start" startet das Spiel.', wait: 100 },
+        ],
+      }
+    }
+
+    return null
+  }
+
   const submitCmd = (e: FormEvent) => {
     e.preventDefault()
+    if (busy) return
     const raw = cmdInput.trim()
     if (!raw) return
-    const next = [...cmdLines, `C:\\> ${raw}`]
+    const next = [...cmdLines, `${cwd}> ${raw}`]
 
     if (game) {
       const moveIndex = parseMove(raw)
@@ -458,7 +630,15 @@ function AdminDesktop() {
 
     const lower = raw.toLowerCase()
 
-    if (/^3erreihe -start\b/.test(lower)) {
+    const fake = fakeCommand(lower)
+    if (fake) {
+      setCmdLines(next)
+      setCmdInput('')
+      play(fake.steps, fake.done)
+      return
+    }
+
+    if (installed && /^3erreihe -start\b/.test(lower)) {
       let first: Side
       if (/\s-a\b/.test(lower)) first = 'A'
       else if (/\s-b\b/.test(lower)) first = 'B'
@@ -482,7 +662,7 @@ function AdminDesktop() {
         const mark = game.turn === 'A' ? game.markA : game.markB
         next.push(`Spieler ${game.turn} (${mark}) ist am Zug.`)
       } else {
-        next.push('Kein laufendes Spiel. Tippe "3erReihe -start".')
+        next.push('Kein laufendes Spiel.')
       }
     } else if (lower === 'quit' || lower === 'exit' || lower === 'stop') {
       if (game) {
@@ -494,12 +674,18 @@ function AdminDesktop() {
     } else if (lower === 'help') {
       next.push('Verfügbare Befehle:')
       next.push('  help                     Zeigt diese Hilfe an')
-      next.push('  3erReihe -start          Startet ein neues Spiel')
-      next.push('  3erReihe -start -A|-B    Erzwingt den ersten Spieler')
-      next.push('  <feld>                   Setzt einen Stein, z.B. a1, b3, set c2')
-      next.push('  board / show             Zeigt das aktuelle Spielfeld')
-      next.push('  quit / exit              Bricht das laufende Spiel ab')
+      if (installed) {
+        next.push('  3erReihe -start          Startet ein neues Spiel')
+        next.push('  3erReihe -start -A|-B    Erzwingt den ersten Spieler')
+        next.push('  <feld>                   Setzt einen Stein, z.B. a1, b3, set c2')
+        next.push('  board / show             Zeigt das aktuelle Spielfeld')
+        next.push('  quit / exit              Bricht das laufende Spiel ab')
+      }
       next.push('  cls / clear              Leert das Terminal')
+      next.push('  git clone <url>          Lädt das Projekt herunter (Simulation)')
+      next.push('  cd 3erReihe              Wechselt in den Projektordner')
+      next.push('  npm install              Installiert die Pakete (Simulation)')
+      next.push('  npm run dev              Startet den Dev-Server (Simulation)')
     } else if (lower === 'cls' || lower === 'clear') {
       setCmdLines([])
       setCmdInput('')
@@ -548,370 +734,348 @@ function AdminDesktop() {
     return `${h12}:${mm} ${h >= 12 ? 'PM' : 'AM'}`
   })()
 
-return (
-  <div className="desktop">
-    <div className="desktop-screen">
-      <div
-        className="desktop-sky"
-        aria-hidden="true"
-        style={{
-          background: `linear-gradient(180deg, ${sky.top} 0%, ${sky.mid} 45%, ${sky.bot} 100%)`,
-        }}
-      >
-        <div className="desktop-stars" style={{ opacity: night }}>
-          {STARS.map((s, i) => (
-            <span
-              key={i}
-              className="desktop-star"
-              style={{
-                left: `${s.x}%`,
-                top: `${s.y}%`,
-                width: `${s.size}px`,
-                height: `${s.size}px`,
-                animationDelay: `${s.delay}s`,
-              }}
-            />
-          ))}
-        </div>
-
-        <span className="desktop-sun" style={{ opacity: 1 - night }} />
-        <span className="desktop-moon" style={{ opacity: night }} />
-
-        <div className="desktop-meteors" style={{ opacity: night }} aria-hidden="true">
-          <span className="desktop-meteor desktop-meteor--1" />
-          <span className="desktop-meteor desktop-meteor--2" />
-          <span className="desktop-meteor desktop-meteor--3" />
-          <span className="desktop-meteor desktop-meteor--4" />
-        </div>
-
-        <div className="desktop-clouds">
-          {[0, 1].map((copy) => (
-            <div className="desktop-clouds-track" key={copy}>
-              <span className="desktop-cloud desktop-cloud--a" />
-              <span className="desktop-cloud desktop-cloud--b" />
-              <span className="desktop-cloud desktop-cloud--c" />
-              <span className="desktop-cloud desktop-cloud--d" />
-            </div>
-          ))}
-        </div>
-
-        <span
-          className="desktop-hill desktop-hill--far"
-          style={{ filter: `brightness(${1 - night * 0.5}) saturate(${1 - night * 0.3})` }}
-        />
-        <span
-          className="desktop-hill desktop-hill--near"
-          style={{ filter: `brightness(${1 - night * 0.5}) saturate(${1 - night * 0.3})` }}
-        />
-      </div>
-
-      <div className="desktop-icons">
-        <button
-          type="button"
-          className="desktop-icon"
-          onClick={() => {
-            setFolderOpen(true)
-            activate('folder')
-            setStartOpen(false)
+  return (
+    <div className="desktop">
+      <div className="desktop-screen">
+        <div
+          className="desktop-sky"
+          aria-hidden="true"
+          style={{
+            background: `linear-gradient(180deg, ${sky.top} 0%, ${sky.mid} 45%, ${sky.bot} 100%)`,
           }}
         >
-          <span className="desktop-icon-art desktop-icon-art--folder" aria-hidden="true" />
-          <span className="desktop-icon-label">{t('admin.3')}</span>
-        </button>
+          <div className="desktop-stars" style={{ opacity: night }}>
+            {STARS.map((s, i) => (
+              <span
+                key={i}
+                className="desktop-star"
+                style={{
+                  left: `${s.x}%`,
+                  top: `${s.y}%`,
+                  width: `${s.size}px`,
+                  height: `${s.size}px`,
+                  animationDelay: `${s.delay}s`,
+                }}
+              />
+            ))}
+          </div>
 
-        <LocalizedLink to="/" className="desktop-icon">
-          <span className="desktop-icon-art desktop-icon-art--globe" aria-hidden="true" />
-          <span className="desktop-icon-label">{t('admin.back')}</span>
-        </LocalizedLink>
-      </div>
+          <span className="desktop-sun" style={{ opacity: 1 - night }} />
+          <span className="desktop-moon" style={{ opacity: night }} />
 
-      <div className="desktop-window-layer">
-        {folderOpen && (
-          <DraggableWindow
-            title={t('admin.3')}
-            kind="folder"
-            initial={{ x: -200, y: -40 }}
-            zIndex={windowZ.folder}
-            onActivate={() => activate('folder')}
-            onClose={() => setFolderOpen(false)}
-          >
-            <div className="desktop-window-body desktop-window-body--explorer">
-              <div className="desktop-explorer-bar">{t('admin.3')}</div>
-              <div className="desktop-explorer-grid">
-                <button
-                  type="button"
-                  className="desktop-explorer-item"
-                  onClick={() => {
-                    setReadmeOpen(true)
-                    activate('readme')
-                  }}
-                >
-                  <span
-                    className="desktop-explorer-icon desktop-explorer-icon--txt"
-                    aria-hidden="true"
-                  />
-                  <span className="desktop-explorer-label">README.txt</span>
-                </button>
+          <div className="desktop-meteors" style={{ opacity: night }} aria-hidden="true">
+            <span className="desktop-meteor desktop-meteor--1" />
+            <span className="desktop-meteor desktop-meteor--2" />
+            <span className="desktop-meteor desktop-meteor--3" />
+            <span className="desktop-meteor desktop-meteor--4" />
+          </div>
+
+          <div className="desktop-clouds">
+            {[0, 1].map((copy) => (
+              <div className="desktop-clouds-track" key={copy}>
+                <span className="desktop-cloud desktop-cloud--a" />
+                <span className="desktop-cloud desktop-cloud--b" />
+                <span className="desktop-cloud desktop-cloud--c" />
+                <span className="desktop-cloud desktop-cloud--d" />
               </div>
-            </div>
-          </DraggableWindow>
-        )}
+            ))}
+          </div>
 
-        {readmeOpen && (
-          <DraggableWindow
-            title="README.txt - Editor"
-            kind="txt"
-            initial={{ x: 180, y: 40 }}
-            zIndex={windowZ.readme}
-            onActivate={() => activate('readme')}
-            onClose={() => setReadmeOpen(false)}
-          >
-            <div className="desktop-window-body desktop-window-body--notepad">
-              <pre className="desktop-notepad">
-                {[
-                  t('admin.3'),
-                  '='.repeat(t('admin.3').length),
-                  '',
-                  `• ${t('admin.start')}`,
-                  `• ${t('admin.cmd')}`,
-                  `• ${t('admin.gamestart')}`,
-                  `• ${t('admin.follow')}`,
-                ].join('\n')}
-              </pre>
-            </div>
-          </DraggableWindow>
-        )}
-
-        {cmdOpen && (
-          <DraggableWindow
-            title="C:\\"
-            kind="cmd"
-            initial={{ x: 0, y: 120 }}
-            zIndex={windowZ.cmd}
-            onActivate={() => activate('cmd')}
-            onClose={() => setCmdOpen(false)}
-          >
-            <div className="desktop-window-body desktop-window-body--cmd">
-              <div className="desktop-cmd-output" ref={cmdOutputRef}>
-                {cmdLines.map((line, i) => (
-                  <div key={i} className="desktop-cmd-line">
-                    {line || '\u00A0'}
-                  </div>
-                ))}
-              </div>
-              <form className="desktop-cmd-form" onSubmit={submitCmd}>
-                <span className="desktop-cmd-prompt">C:\&gt;</span>
-                <input
-                  className="desktop-cmd-input"
-                  value={cmdInput}
-                  onChange={(e) => setCmdInput(e.target.value)}
-                  spellCheck={false}
-                  autoComplete="off"
-                  autoFocus
-                />
-              </form>
-            </div>
-          </DraggableWindow>
-        )}
-      </div>
-
-      {startOpen && (
-        <>
-          <div
-            className="desktop-start-backdrop"
-            onClick={() => setStartOpen(false)}
-            aria-hidden="true"
+          <span
+            className="desktop-hill desktop-hill--far"
+            style={{ filter: `brightness(${1 - night * 0.5}) saturate(${1 - night * 0.3})` }}
           />
-          <div className="desktop-startmenu" role="menu" aria-label="Start">
-            <div className="desktop-startmenu-user">
-              <span className="desktop-avatar" aria-hidden="true">
-                {name.charAt(0).toUpperCase()}
-              </span>
-              <div className="desktop-startmenu-usertext">
-                <p className="desktop-startmenu-name">{name}</p>
-                <p className="desktop-startmenu-role">
-                  {t('admin.role', { defaultValue: 'Administrator' })}
-                </p>
-              </div>
-            </div>
+          <span
+            className="desktop-hill desktop-hill--near"
+            style={{ filter: `brightness(${1 - night * 0.5}) saturate(${1 - night * 0.3})` }}
+          />
+        </div>
 
+        <div className="desktop-icons">
+          <button
+            type="button"
+            className="desktop-icon"
+            onClick={() => {
+              setFolderOpen(true)
+              activate('folder')
+              setStartOpen(false)
+            }}
+          >
+            <span className="desktop-icon-art desktop-icon-art--folder" aria-hidden="true" />
+            <span className="desktop-icon-label">{t('admin.3')}</span>
+          </button>
+
+          <LocalizedLink to="/" className="desktop-icon">
+            <span className="desktop-icon-art desktop-icon-art--globe" aria-hidden="true" />
+            <span className="desktop-icon-label">{t('admin.back')}</span>
+          </LocalizedLink>
+        </div>
+
+        <div className="desktop-window-layer">
+          {folderOpen && (
+            <DraggableWindow
+              title={t('admin.3')}
+              kind="folder"
+              initial={{ x: -260, y: -60 }}
+              zIndex={windowZ.folder}
+              onActivate={() => activate('folder')}
+              onClose={() => setFolderOpen(false)}
+            >
+              <div className="desktop-window-body desktop-window-body--explorer">
+                <div className="desktop-explorer-bar">{t('admin.3')}</div>
+                <div className="desktop-explorer-grid">
+                  <button
+                    type="button"
+                    className="desktop-explorer-item"
+                    onClick={() => {
+                      setReadmeOpen(true)
+                      activate('readme')
+                    }}
+                  >
+                    <span
+                      className="desktop-explorer-icon desktop-explorer-icon--txt"
+                      aria-hidden="true"
+                    />
+                    <span className="desktop-explorer-label">README.txt</span>
+                  </button>
+                </div>
+              </div>
+            </DraggableWindow>
+          )}
+
+          {readmeOpen && (
+            <DraggableWindow
+              title="README.txt - Editor"
+              kind="txt"
+              initial={{ x: 220, y: 20 }}
+              zIndex={windowZ.readme}
+              onActivate={() => activate('readme')}
+              onClose={() => setReadmeOpen(false)}
+            >
+              <div className="desktop-window-body desktop-window-body--notepad">
+                <pre className="desktop-notepad">{README_TEXT}</pre>
+              </div>
+            </DraggableWindow>
+          )}
+
+          {cmdOpen && (
+            <DraggableWindow
+              title={'C:\\'}
+              kind="cmd"
+              initial={{ x: 0, y: 100 }}
+              zIndex={windowZ.cmd}
+              onActivate={() => activate('cmd')}
+              onClose={() => setCmdOpen(false)}
+            >
+              <div className="desktop-window-body desktop-window-body--cmd">
+                <div className="desktop-cmd-output" ref={cmdOutputRef}>
+                  {cmdLines.map((line, i) => (
+                    <div key={i} className="desktop-cmd-line">
+                      {line || '\u00A0'}
+                    </div>
+                  ))}
+                </div>
+                <form className="desktop-cmd-form" onSubmit={submitCmd}>
+                  <span className="desktop-cmd-prompt">{cwd}&gt;</span>
+                  <input
+                    ref={cmdInputRef}
+                    className="desktop-cmd-input"
+                    value={cmdInput}
+                    onChange={(e) => setCmdInput(e.target.value)}
+                    spellCheck={false}
+                    autoComplete="off"
+                    autoFocus
+                    disabled={busy}
+                  />
+                </form>
+              </div>
+            </DraggableWindow>
+          )}
+        </div>
+
+        {startOpen && (
+          <>
+            <div
+              className="desktop-start-backdrop"
+              onClick={() => setStartOpen(false)}
+              aria-hidden="true"
+            />
+            <div className="desktop-startmenu" role="menu" aria-label="Start">
+              <div className="desktop-startmenu-user">
+                <span className="desktop-avatar" aria-hidden="true">
+                  {name.charAt(0).toUpperCase()}
+                </span>
+                <div className="desktop-startmenu-usertext">
+                  <p className="desktop-startmenu-name">{name}</p>
+                  <p className="desktop-startmenu-role">
+                    {t('admin.role', { defaultValue: 'Administrator' })}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                role="menuitem"
+                className="desktop-startmenu-item"
+                onClick={() => {
+                  setFolderOpen(true)
+                  activate('folder')
+                  setStartOpen(false)
+                }}
+              >
+                <span
+                  className="desktop-startmenu-icon desktop-startmenu-icon--folder"
+                  aria-hidden="true"
+                />
+                {t('admin.3')}
+              </button>
+
+              <button
+                type="button"
+                role="menuitem"
+                className="desktop-startmenu-item"
+                onClick={() => {
+                  setCmdOpen(true)
+                  activate('cmd')
+                  setStartOpen(false)
+                }}
+              >
+                <span
+                  className="desktop-startmenu-icon desktop-startmenu-icon--cmd"
+                  aria-hidden="true"
+                />
+                cmd
+              </button>
+
+              <LocalizedLink
+                to="/"
+                role="menuitem"
+                className="desktop-startmenu-item desktop-startmenu-item--back"
+              >
+                <span
+                  className="desktop-startmenu-icon desktop-startmenu-icon--back"
+                  aria-hidden="true"
+                />
+                {t('admin.back')}
+              </LocalizedLink>
+            </div>
+          </>
+        )}
+
+        {clockOpen && (
+          <>
+            <div
+              className="desktop-clock-backdrop"
+              onClick={() => setClockOpen(false)}
+              aria-hidden="true"
+            />
+            <div
+              className="desktop-clock-panel"
+              role="dialog"
+              aria-label="Uhrzeit anpassen"
+            >
+              <p className="desktop-clock-title">Uhrzeit anpassen</p>
+
+              <AnalogClock
+                hour={displayTime.getHours()}
+                minute={displayTime.getMinutes()}
+                onChange={setClockTime}
+              />
+
+              <button
+                type="button"
+                className="desktop-clock-readout"
+                onClick={togglePeriod}
+                title="AM/PM umschalten"
+              >
+                {time12}
+              </button>
+
+              <button
+                type="button"
+                className="desktop-clock-btn desktop-clock-btn--ghost"
+                onClick={resetClock}
+              >
+                Live
+              </button>
+            </div>
+          </>
+        )}
+
+        <div className="desktop-taskbar">
+          <button
+            type="button"
+            className={`desktop-start${startOpen ? ' is-open' : ''}`}
+            onClick={() => setStartOpen((s) => !s)}
+            aria-haspopup="menu"
+            aria-expanded={startOpen}
+          >
+            <span className="desktop-flag" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+              <span />
+            </span>
+            Start
+          </button>
+
+          {folderOpen && (
             <button
               type="button"
-              role="menuitem"
-              className="desktop-startmenu-item"
+              className="desktop-task"
               onClick={() => {
-                setFolderOpen(true)
-                activate('folder')
+                setFolderOpen(false)
                 setStartOpen(false)
               }}
             >
               <span
-                className="desktop-startmenu-icon desktop-startmenu-icon--folder"
+                className="desktop-window-icon desktop-window-icon--folder"
                 aria-hidden="true"
               />
               {t('admin.3')}
             </button>
+          )}
 
+          {readmeOpen && (
             <button
               type="button"
-              role="menuitem"
-              className="desktop-startmenu-item"
+              className="desktop-task"
               onClick={() => {
-                setCmdOpen(true)
-                activate('cmd')
+                setReadmeOpen(false)
                 setStartOpen(false)
               }}
             >
-              <span
-                className="desktop-startmenu-icon desktop-startmenu-icon--cmd"
-                aria-hidden="true"
-              />
-              cmd
+              <span className="desktop-window-icon desktop-window-icon--txt" aria-hidden="true" />
+              README.txt
             </button>
+          )}
 
-            <LocalizedLink
-              to="/"
-              role="menuitem"
-              className="desktop-startmenu-item desktop-startmenu-item--back"
-            >
-              <span
-                className="desktop-startmenu-icon desktop-startmenu-icon--back"
-                aria-hidden="true"
-              />
-              {t('admin.back')}
-            </LocalizedLink>
-          </div>
-        </>
-      )}
-
-      {clockOpen && (
-        <>
-          <div
-            className="desktop-clock-backdrop"
-            onClick={() => setClockOpen(false)}
-            aria-hidden="true"
-          />
-          <div
-            className="desktop-clock-panel"
-            role="dialog"
-            aria-label="Uhrzeit anpassen"
-          >
-            <p className="desktop-clock-title">Uhrzeit anpassen</p>
-
-            <AnalogClock
-              hour={displayTime.getHours()}
-              minute={displayTime.getMinutes()}
-              onChange={setClockTime}
-            />
-
+          {cmdOpen && (
             <button
               type="button"
-              className="desktop-clock-readout"
-              onClick={togglePeriod}
-              title="AM/PM umschalten"
+              className="desktop-task"
+              onClick={() => {
+                setCmdOpen(false)
+                setStartOpen(false)
+              }}
             >
-              {time12}
+              <span className="desktop-window-icon desktop-window-icon--cmd" aria-hidden="true" />
+              C:\
             </button>
+          )}
 
-            <button
-              type="button"
-              className="desktop-clock-btn desktop-clock-btn--ghost"
-              onClick={resetClock}
-            >
-              Live
-            </button>
-          </div>
-        </>
-      )}
-
-      <div className="desktop-taskbar">
-        <button
-          type="button"
-          className={`desktop-start${startOpen ? ' is-open' : ''}`}
-          onClick={() => setStartOpen((s) => !s)}
-          aria-haspopup="menu"
-          aria-expanded={startOpen}
-        >
-          <span className="desktop-flag" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-            <span />
-          </span>
-          Start
-        </button>
-
-        {open && (
           <button
             type="button"
-            className="desktop-task is-active"
-            onClick={() => {
-              setOpen(false)
-              setStartOpen(false)
-            }}
+            className={`desktop-tray${simulated ? ' is-simulated' : ''}`}
+            onClick={() => setClockOpen((o) => !o)}
+            aria-haspopup="dialog"
+            aria-expanded={clockOpen}
+            title="Uhrzeit anpassen"
           >
-            <span className="desktop-window-icon" aria-hidden="true" />
-            {name}
+            {time}
           </button>
-        )}
-
-        {folderOpen && (
-          <button
-            type="button"
-            className="desktop-task"
-            onClick={() => {
-              setFolderOpen(false)
-              setStartOpen(false)
-            }}
-          >
-            <span
-              className="desktop-window-icon desktop-window-icon--folder"
-              aria-hidden="true"
-            />
-            {t('admin.3')}
-          </button>
-        )}
-
-        {readmeOpen && (
-          <button
-            type="button"
-            className="desktop-task"
-            onClick={() => {
-              setReadmeOpen(false)
-              setStartOpen(false)
-            }}
-          >
-            <span className="desktop-window-icon desktop-window-icon--txt" aria-hidden="true" />
-            README.txt
-          </button>
-        )}
-
-        {cmdOpen && (
-          <button
-            type="button"
-            className="desktop-task"
-            onClick={() => {
-              setCmdOpen(false)
-              setStartOpen(false)
-            }}
-          >
-            <span className="desktop-window-icon desktop-window-icon--cmd" aria-hidden="true" />
-            C:\
-          </button>
-        )}
-
-        <button
-          type="button"
-          className={`desktop-tray${simulated ? ' is-simulated' : ''}`}
-          onClick={() => setClockOpen((o) => !o)}
-          aria-haspopup="dialog"
-          aria-expanded={clockOpen}
-          title="Uhrzeit anpassen"
-        >
-          {time}
-        </button>
+        </div>
       </div>
     </div>
-  </div>
-)
+  )
 }

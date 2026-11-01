@@ -5,8 +5,6 @@ import './Onlinepage.css'
 import NavBar from '../components/NavBar'
 import LocalizedLink from '../components/LocalizedLink'
 
-// Absichtlich unrealistische Zahlen, zwischen denen hin- und hergewechselt wird
-const QUEUE_NUMBERS = [2029, 42, 99999, 7, 12345, 2029, 3, 65432, 0, 2029]
 const USER_TOKEN_KEY = 'token'
 const SERVER = import.meta.env.DEV ? '' : (import.meta.env.VITE_SERVER as string | undefined)
 
@@ -36,8 +34,6 @@ export default function OnlinePage() {
   const navigate = useNavigate()
   const [identity, setIdentity] = useState<IdentityState>(initialIdentity)
   const [nickname, setNickname] = useState('')
-  const [inQueue, setInQueue] = useState(false)
-  const [queueCount, setQueueCount] = useState(QUEUE_NUMBERS[0])
   const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>([])
   const [leaderboardError, setLeaderboardError] = useState(false)
   const [leaderboardLoaded, setLeaderboardLoaded] = useState(false)
@@ -92,6 +88,7 @@ export default function OnlinePage() {
 
     const controller = new AbortController()
     const verifyToken = async () => {
+      let currentToken = identity.token
       try {
         if (!import.meta.env.DEV && !SERVER) {
           throw new Error('VITE_SERVER is not configured.')
@@ -102,9 +99,12 @@ export default function OnlinePage() {
           signal: controller.signal,
         })
 
+        currentToken = response.headers.get('X-User-Token') || currentToken
+        sessionStorage.setItem(USER_TOKEN_KEY, currentToken)
+
         if (response.status === 401) {
           sessionStorage.removeItem(USER_TOKEN_KEY)
-          setIdentity({ status: 'missing', token: identity.token, error: 'invalidToken' })
+          setIdentity({ status: 'missing', token: currentToken, error: 'invalidToken' })
           return
         }
         if (!response.ok) throw new Error(`User lookup failed with status ${response.status}.`)
@@ -114,31 +114,17 @@ export default function OnlinePage() {
           throw new Error('User lookup returned an invalid response.')
         }
 
-        sessionStorage.setItem(USER_TOKEN_KEY, identity.token)
-        setIdentity({ status: 'authenticated', token: identity.token, name: user.name })
+        setIdentity({ status: 'authenticated', token: currentToken, name: user.name })
       } catch {
         if (controller.signal.aborted) return
-        setIdentity({ status: 'error', token: identity.token, error: 'serverError' })
+        currentToken = sessionStorage.getItem(USER_TOKEN_KEY) ?? currentToken
+        setIdentity({ status: 'error', token: currentToken, error: 'serverError' })
       }
     }
 
     void verifyToken()
     return () => controller.abort()
   }, [identity.status, identity.token])
-
-  useEffect(() => {
-    if (!inQueue) return
-    const id = setInterval(() => {
-      const next = QUEUE_NUMBERS[Math.floor(Math.random() * QUEUE_NUMBERS.length)]
-      setQueueCount(next)
-    }, 1200)
-    return () => clearInterval(id)
-  }, [inQueue])
-
-  const startQueue = () => {
-    setQueueCount(QUEUE_NUMBERS[0])
-    setInQueue(true)
-  }
 
   const submitNickname = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -202,36 +188,18 @@ export default function OnlinePage() {
           <div className="landing-buttons">
             <button
               className="landing-btn landing-btn--primary"
-              onClick={startQueue}
-              disabled={inQueue}
+              onClick={() => navigate(`/${lang}/online/queue`)}
             >
               {t('online.queue')}
             </button>
             <button
               className="landing-btn"
               onClick={() => navigate(`/${lang}/online/private`)}
-              disabled={inQueue}
             >
               {t('online.privateGame')}
             </button>
           </div>
 
-          {inQueue && (
-            <div className="queue-panel">
-              <p className="queue-count" role="status" aria-live="polite">
-                <span className="queue-number">{queueCount.toLocaleString()}</span>
-                <span className="queue-label">
-                  {' '}{t('online.playersInQueue')}
-                </span>
-              </p>
-              <button
-                className="landing-btn landing-btn--ghost"
-                onClick={() => setInQueue(false)}
-              >
-                {t('online.leaveQueue')}
-              </button>
-            </div>
-          )}
         </section>
 
         <aside className="lb-panel" aria-labelledby="online-leaderboard-title">

@@ -58,7 +58,6 @@ export default function NavBar() {
 
       <div className="nav-actions">
 
-        {/* Sprach-Dropdown */}
         <div className="sound-menu-container" ref={langRef}>
           <button
             className="sound-toggle"
@@ -86,7 +85,6 @@ export default function NavBar() {
           )}
         </div>
 
-        {/* Sound Dropdown mit Slidern */}
         <div className="sound-menu-container" ref={soundRef}>
           <button
             className="sound-toggle"
@@ -138,7 +136,6 @@ export default function NavBar() {
           )}
         </div>
 
-        {/* Theme Toggle */}
         <button className="theme-toggle" onClick={toggleTheme} aria-label={t('nav.toggleTheme')}>
           <img src={theme === 'dark' ? sunUrl : moonUrl} alt="" width={20} height={20} />
         </button>

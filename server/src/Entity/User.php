@@ -41,7 +41,7 @@ class User implements UserInterface
     private bool $active = true;
 
     #[ORM\Column(length: 255)]
-    private ?string $usedToken = null;
+    private string $usedToken = '';
 
     public function __construct()
     {
@@ -143,7 +143,7 @@ class User implements UserInterface
     {
     }
 
-    public function getUsedToken(): ?string
+    public function getUsedToken(): string
     {
         return $this->usedToken;
     }

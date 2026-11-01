@@ -10,7 +10,8 @@ services:
       - "5173:5173"
     environment:
       VITE_API_URL: http://localhost:8080
-      VITE_MERCURE_URL: http://localhost:3000/.well-known/mercure
+      VITE_SERVER: ${VITE_SERVER:-http://192.168.178.66:8080}
+      VITE_MERCURE_URL: ${MERCURE_PUBLIC_URL:-http://192.168.178.66:3000/.well-known/mercure}
 
   db:
     image: mariadb:10.4.32
@@ -42,8 +43,10 @@ services:
       - "8080:80"
     environment:
       MERCURE_URL: http://mercure/.well-known/mercure
-      MERCURE_PUBLIC_URL: http://localhost:3000/.well-known/mercure
-      MERCURE_JWT_SECRET: "!ChangeThisMercureHubJWTSecretKey!"
+      MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL:-http://192.168.178.66:3000/.well-known/mercure}
+      MERCURE_JWT_SECRET: "${MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}"
+      MERCURE_JWT_ISSUER: ${MERCURE_JWT_ISSUER:-https://localhost}
+      API_CORS_ORIGINS: ${API_CORS_ORIGINS:-http://192.168.178.66:5173}
     depends_on:
       - db
       - mercure
@@ -53,12 +56,12 @@ services:
     restart: unless-stopped
     environment:
       SERVER_NAME: ":80"
-      MERCURE_PUBLISHER_JWT_KEY: "!ChangeThisMercureHubJWTSecretKey!"
-      MERCURE_SUBSCRIBER_JWT_KEY: "!ChangeThisMercureHubJWTSecretKey!"
+      MERCURE_PUBLISHER_JWT_KEY: "${MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}"
+      MERCURE_SUBSCRIBER_JWT_KEY: "${MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}"
+      MERCURE_CORS_ORIGINS: ${MERCURE_CORS_ORIGINS:-http://192.168.178.66:5173}
       MERCURE_EXTRA_DIRECTIVES: |
-        cors_origins http://localhost:5173
-        anonymous
-    command: /usr/bin/caddy run --config /etc/caddy/dev.Caddyfile
+        cors_origins ${MERCURE_CORS_ORIGINS:-http://192.168.178.66:5173}
+    command: /usr/bin/caddy run --config /etc/caddy/Caddyfile
     ports:
       - "3000:80"
     volumes:

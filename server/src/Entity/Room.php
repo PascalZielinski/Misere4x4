@@ -8,6 +8,14 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 
+#[ORM\Table(
+    indexes: [
+        new ORM\Index(name: 'IDX_ROOM_EXPIRES_AT', columns: ['expires_at']),
+    ],
+    uniqueConstraints: [
+        new ORM\UniqueConstraint(name: 'UNIQ_ROOM_CODE', columns: ['room_code']),
+    ],
+)]
 #[ORM\Entity(repositoryClass: RoomRepository::class)]
 class Room
 {
@@ -16,8 +24,14 @@ class Room
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'uuid')]
-    private ?Uuid $roomUuid = null;
+    #[ORM\Column]
+    private ?int $roomCode = null;
+
+    #[ORM\Column(length: 36, unique: true)]
+    private string $roomUuid;
+
+    #[ORM\Column(options: ['default' => false])]
+    private bool $matchmade = false;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -29,14 +43,21 @@ class Room
     private ?\DateTimeImmutable $expiresAt = null;
 
     /**
+     * @var array<string, mixed>
+     */
+    #[ORM\Column(type: 'json')]
+    private array $gameState = [];
+
+    /**
      * @var Collection<int, RoomParticipant>
      */
-    #[ORM\OneToMany(targetEntity: RoomParticipant::class, mappedBy: 'Room')]
+    #[ORM\OneToMany(targetEntity: RoomParticipant::class, mappedBy: 'room', cascade: ['remove'], orphanRemoval: true)]
     private Collection $roomParticipants;
 
     public function __construct()
     {
         $this->roomParticipants = new ArrayCollection();
+        $this->roomUuid = Uuid::v4()->toRfc4122();
     }
 
     public function getId(): ?int
@@ -44,14 +65,31 @@ class Room
         return $this->id;
     }
 
-    public function getRoomUuid(): ?Uuid
+    public function getRoomCode(): ?int
+    {
+        return $this->roomCode;
+    }
+
+    public function getRoomUuid(): string
     {
         return $this->roomUuid;
     }
 
-    public function setRoomUuid(Uuid $roomUuid): static
+    public function isMatchmade(): bool
     {
-        $this->roomUuid = $roomUuid;
+        return $this->matchmade;
+    }
+
+    public function setMatchmade(bool $matchmade): static
+    {
+        $this->matchmade = $matchmade;
+
+        return $this;
+    }
+
+    public function setRoomCode(int $roomCode): static
+    {
+        $this->roomCode = $roomCode;
 
         return $this;
     }
@@ -93,6 +131,24 @@ class Room
     }
 
     /**
+     * @return array<string, mixed>
+     */
+    public function getGameState(): array
+    {
+        return $this->gameState;
+    }
+
+    /**
+     * @param array<string, mixed> $gameState
+     */
+    public function setGameState(array $gameState): static
+    {
+        $this->gameState = $gameState;
+
+        return $this;
+    }
+
+    /**
      * @return Collection<int, RoomParticipant>
      */
     public function getRoomParticipants(): Collection
@@ -110,15 +166,4 @@ class Room
         return $this;
     }
 
-    public function removeRoomParticipant(RoomParticipant $roomParticipant): static
-    {
-        if ($this->roomParticipants->removeElement($roomParticipant)) {
-            // set the owning side to null (unless already changed)
-            if ($roomParticipant->getRoom() === $this) {
-                $roomParticipant->setRoom(null);
-            }
-        }
-
-        return $this;
-    }
 }

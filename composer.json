@@ -1,0 +1,5 @@
+{
+    "require": {
+        "symfony/rate-limiter": "^7.4"
+    }
+}

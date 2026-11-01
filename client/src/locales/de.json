@@ -18,6 +18,13 @@
         "musicVolume": "Lautstärke für Musik",
         "toggleTheme": "Darkmode umschalten"
     },
+    "cookieConsent": {
+        "title": "Cookie-Einstellungen",
+        "message": "misere4x4 verwendet Cookies, um dir eine ausgezeichnete Nutzererfahrung zu bieten. Wenn du auf „Akzeptieren“ klickst, stimmst du den <policyLink>Cookie-Richtlinien</policyLink> zu.",
+        "accept": "Akzeptieren",
+        "deny": "Ablehnen",
+        "storageError": "Deine Auswahl konnte nicht gespeichert werden. Bitte erlaube localStorage und versuche es erneut."
+    },
     "notFound": {
         "text": "Diese Seite gibt es nicht.",
         "back": "Zurück zur Startseite"
@@ -143,13 +150,17 @@
     "online": {
         "queue": "Queue",
         "privateGame": "Privatesspiel",
+        "requeue": "Erneut suchen",
+        "backToOnline": "Zurück",
         "leaderboardTitle": "Bestenliste",
         "leaderboardEmpty": "Noch keine Spieler vorhanden.",
         "leaderboardError": "Die Bestenliste konnte nicht geladen werden.",
         "activeUser": "Aktiv",
         "inactiveUser": "Inaktiv",
         "playerInQueue": "Spieler Wartend",
+        "playersInQueue": "Spieler in der Warteschlange",
         "leaveQueue": "Spielersuche abbrechen",
+        "queueError": "Die Spielersuche ist fehlgeschlagen. Bitte versuche es erneut.",
         "backToHome": "Zurück zur Startseite",
         "checkingToken": "Spieler-Token wird überprüft…",
         "signedInAs": "Du spielst als {{name}}",
@@ -175,7 +186,44 @@
         "joining": "Trete bei …",
         "invalid": "Bitte gib einen gültigen 4-stelligen Code ein.",
         "notFound": "Kein Raum mit diesem Code gefunden.",
-        "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+        "unauthorized": "Melde dich zuerst im Online-Bereich an.",
+        "goOnline": "Zum Online-Bereich",
+        "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+        "game": {
+            "title": "Privates Spiel",
+            "roomCode": "Raumcode: {{code}}",
+            "inviteLink": "Einladungslink",
+            "copyLink": "Link kopieren",
+            "copied": "Kopiert",
+            "waiting": "Warte auf den zweiten Spieler. Teile den Link oder den Raumcode.",
+            "playerA": "Spieler A",
+            "playerB": "Spieler B",
+            "sideMark": "Markierung {{mark}}",
+            "scoreVersus": "{{scoreA}} : {{scoreB}}",
+            "yourTurn": "Du bist dran – setze {{mark}}",
+            "opponentTurn": "{{name}} ist dran – {{mark}}",
+            "timeLeft": "Noch {{seconds}} Sekunden",
+            "draw": "Unentschieden",
+            "drawCount": "Unentschieden! Lokale Remis: {{count}}",
+            "winner": "{{name}} gewinnt diese Runde!",
+            "localScore": "Lokaler Punktestand: {{scoreA}} : {{scoreB}}",
+            "playAgain": "Nächste Runde",
+            "firstTurn": "Wer beginnt?",
+            "loading": "Privater Raum wird geladen …",
+            "retry": "Erneut versuchen",
+            "board": "Spielfeld",
+            "cell": "Reihe {{row}}, Spalte {{column}}: {{mark}}",
+            "empty": "leer",
+            "backToRooms": "Zurück zu privaten Räumen",
+            "goOnline": "Zum Online-Bereich",
+            "errors": {
+                "expired": "Dieser Raum ist abgelaufen.",
+                "unauthorized": "Dein Spieler-Token fehlt oder ist abgelaufen. Öffne zuerst den Online-Bereich.",
+                "load": "Der Raum konnte nicht geladen werden. Bitte prüfe deine Verbindung.",
+                "move": "Der Zug konnte nicht ausgeführt werden. Der aktuelle Spielstand wird neu geladen.",
+                "score": "Der lokale Punktestand kann nicht dauerhaft gespeichert werden."
+            }
+        }
     },
     "rating": {
         "title": "Wie war deine Erfahrung?",
@@ -183,7 +231,7 @@
         "star": "Stern",
         "stars": "Sterne",
         "comment": "Bemerkung (optional)",
-        "placeholder": "Was hat dir gefallen? Was können wir besser machen?",
+        "placeholder": "Was hat den Reviewern gefallen, was nicht?",
         "submit": "Absenden",
         "sending": "Wird gesendet…",
         "success": "Danke für dein Feedback!",

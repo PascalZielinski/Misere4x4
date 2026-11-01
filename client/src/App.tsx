@@ -15,12 +15,16 @@ import QueuePage from "./pages/Queuepage"
 import PrivateRoomPage from "./pages/Privateroompage"
 import RatingPage from "./pages/Ratingpage"
 import Unauthorized from "./pages/401"
+import PrivateRoomGamePage from "./pages/PrivateRoomGamePage"
+import CookieConsent from "./components/CookieConsent"
+import CookieTosPage from "./pages/cookieTos"
 
 function RootLayout() {
   return (
     <>
       <BackgroundMusic />
       <Outlet />
+      <CookieConsent />
     </>
   )
 }
@@ -45,6 +49,7 @@ async function langLoader({ params, request }: LoaderFunctionArgs) {
 
 const router = createBrowserRouter([
   { path: "/", loader: rootRedirect },
+  { path: "/cookieTos", loader: () => redirect(`/${detectLanguage()}/cookieTos`) },
   {
     path: "/:lang",
     loader: langLoader,
@@ -53,13 +58,14 @@ const router = createBrowserRouter([
       { index: true, element: <LandingPage /> },
       { path: "local", element: <LocalGame /> },
       { path: "licenses", element: <LicensesPage /> },
+      { path: "cookieTos", element: <CookieTosPage /> },
       { path: "tutorial", element: <TutorialPage /> },
       { path: "admin", element: <AdminPage /> },
       { path: "admin/dashboard", element: <AdminDashboard /> },
       { path: "online", element: <OnlinePage /> },
       { path: "online/queue", element: <QueuePage /> },
       { path: "online/private", element: <PrivateRoomPage /> },
-      //{ path: "online/private/room/:code?", element: <PrivateRoomLobbyPage /> },
+      { path: "online/private/room/:code", element: <PrivateRoomGamePage /> },
       { path: "rating", element: <RatingPage />},
       { path: "401", element: <Unauthorized />},
       { path: "*", element: <NotFound /> },

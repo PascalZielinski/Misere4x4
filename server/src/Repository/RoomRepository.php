@@ -16,28 +16,29 @@ class RoomRepository extends ServiceEntityRepository
         parent::__construct($registry, Room::class);
     }
 
-//    /**
-//     * @return Room[] Returns an array of Room objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('r.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    /**
+     * @return Room[]
+     */
+    public function findExpired(\DateTimeImmutable $now): array
+    {
+        return $this->createQueryBuilder('room')
+            ->andWhere('room.expiresAt <= :now')
+            ->setParameter('now', $now)
+            ->getQuery()
+            ->getResult();
+    }
 
-//    public function findOneBySomeField($value): ?Room
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    /**
+     * @return int[]
+     */
+    public function findRoomCodes(): array
+    {
+        return array_map(
+            'intval',
+            $this->createQueryBuilder('room')
+                ->select('room.roomCode')
+                ->getQuery()
+                ->getSingleColumnResult(),
+        );
+    }
 }

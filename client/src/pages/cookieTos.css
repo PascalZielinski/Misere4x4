@@ -1,0 +1,15 @@
+.cookie-tos-page {
+  display: grid;
+  flex: 1;
+  box-sizing: border-box;
+  place-items: center;
+  padding: 2rem 2rem 5rem;
+  text-align: center;
+}
+
+.cookie-tos-page p {
+  margin: 0;
+  font-size: clamp(2rem, 6vw, 4.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+}

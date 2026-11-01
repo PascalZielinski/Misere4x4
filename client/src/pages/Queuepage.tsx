@@ -1,25 +1,68 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import './Onlinepage.css'
 import NavBar from '../components/NavBar'
 import LocalizedLink from '../components/LocalizedLink'
-
-const QUEUE_NUMBERS = [2029, 2590, 1089, 2029, 2029]
+import { getQueueStatus, joinQueue, leaveQueue, type QueueState } from '../api/queue'
 
 export default function QueuePage() {
   const { t } = useTranslation()
   const { lang } = useParams()
   const navigate = useNavigate()
-  const [queueCount, setQueueCount] = useState(QUEUE_NUMBERS[0])
+  const [queueState, setQueueState] = useState<QueueState | null>(null)
+  const [error, setError] = useState(false)
+  const [leaving, setLeaving] = useState(false)
+
+  const applyQueueState = useCallback((next: QueueState) => {
+    setQueueState(next)
+    if (next.status === 'matched' && next.roomUuid) {
+      navigate(`/${lang}/online/private/room/${next.roomUuid}`, { replace: true })
+    }
+  }, [lang, navigate])
 
   useEffect(() => {
-    const id = setInterval(() => {
-      const next = QUEUE_NUMBERS[Math.floor(Math.random() * QUEUE_NUMBERS.length)]
-      setQueueCount(next)
-    }, 1200)
-    return () => clearInterval(id)
-  }, [])
+    let active = true
+    const poll = async () => {
+      try {
+        const next = await getQueueStatus()
+        if (active) {
+          setError(false)
+          applyQueueState(next)
+        }
+      } catch {
+        if (active) setError(true)
+      }
+    }
+
+    void joinQueue()
+      .then((next) => {
+        if (active) {
+          setError(false)
+          applyQueueState(next)
+        }
+      })
+      .catch(() => {
+        if (active) setError(true)
+      })
+
+    const interval = window.setInterval(() => void poll(), 1500)
+    return () => {
+      active = false
+      window.clearInterval(interval)
+    }
+  }, [applyQueueState])
+
+  const onLeaveQueue = async () => {
+    setLeaving(true)
+    try {
+      await leaveQueue()
+      navigate(`/${lang}/online`)
+    } catch {
+      setError(true)
+      setLeaving(false)
+    }
+  }
 
   return (
     <div className="landing">
@@ -27,15 +70,20 @@ export default function QueuePage() {
 
       <main className="landing-main">
         <div className="queue-panel">
-          <p className="queue-count" role="status" aria-live="polite">
-            <span className="queue-number">{queueCount.toLocaleString()}</span>
-            <span className="queue-label">
-              {' '}{t('online.playersInQueue')}
-            </span>
-          </p>
+          {error ? (
+            <p className="online-token-error" role="alert">{t('online.queueError')}</p>
+          ) : (
+            <p className="queue-count" role="status" aria-live="polite">
+              <span className="queue-number">
+                {(queueState?.queueCount ?? 0).toLocaleString()}
+              </span>
+              <span className="queue-label">{' '}{t('online.playersInQueue')}</span>
+            </p>
+          )}
           <button
             className="landing-btn landing-btn--ghost"
-            onClick={() => navigate(`/${lang}/online`)}
+            onClick={() => void onLeaveQueue()}
+            disabled={leaving}
           >
             {t('online.leaveQueue')}
           </button>

@@ -18,6 +18,13 @@
         "musicVolume": "Music volume",
         "toggleTheme": "Toggle dark mode"
     },
+    "cookieConsent": {
+        "title": "Cookie settings",
+        "message": "misere4x4 uses cookies to provide you with an excellent user experience. By clicking “Accept”, you agree to the <policyLink>Cookie Policy</policyLink>.",
+        "accept": "Accept",
+        "deny": "Deny",
+        "storageError": "Your choice could not be saved. Please allow localStorage and try again."
+    },
     "notFound": {
         "text": "This page doesn't exist.",
         "back": "Back to home"
@@ -143,13 +150,17 @@
     "online": {
         "queue": "Queue",
         "privateGame": "Private Game",
+        "requeue": "Search again",
+        "backToOnline": "Back",
         "leaderboardTitle": "Leaderboard",
         "leaderboardEmpty": "No players yet.",
         "leaderboardError": "Leaderboard could not be loaded.",
         "activeUser": "Active",
         "inactiveUser": "Inactive",
         "playerInQueue": "Waiting Game",
+        "playersInQueue": "players in queue",
         "leaveQueue": "Leave Queue",
+        "queueError": "Matchmaking failed. Please try again.",
         "backToHome": "Back to home",
         "checkingToken": "Checking player token…",
         "signedInAs": "Youre Playing as {{name}}",
@@ -175,7 +186,44 @@
         "joining": "Joining …",
         "invalid": "Please enter a valid 4-digit code.",
         "notFound": "No room found with this code.",
-        "generic": "Something went wrong. Please try again."
+        "unauthorized": "Sign in from the online section first.",
+        "goOnline": "Go to online section",
+        "generic": "Something went wrong. Please try again.",
+        "game": {
+            "title": "Private game",
+            "roomCode": "Room code: {{code}}",
+            "inviteLink": "Invite link",
+            "copyLink": "Copy link",
+            "copied": "Copied",
+            "waiting": "Waiting for the second player. Share the link or room code.",
+            "playerA": "Player A",
+            "playerB": "Player B",
+            "sideMark": "Mark {{mark}}",
+            "scoreVersus": "{{scoreA}} : {{scoreB}}",
+            "yourTurn": "Your turn — place {{mark}}",
+            "opponentTurn": "{{name}}'s turn — {{mark}}",
+            "timeLeft": "{{seconds}} seconds left",
+            "draw": "Draw",
+            "drawCount": "Draw! Local draws: {{count}}",
+            "winner": "{{name}} wins this round!",
+            "localScore": "Local score: {{scoreA}} : {{scoreB}}",
+            "playAgain": "Next round",
+            "firstTurn": "Who goes first?",
+            "loading": "Loading private room …",
+            "retry": "Try again",
+            "board": "Game board",
+            "cell": "Row {{row}}, column {{column}}: {{mark}}",
+            "empty": "empty",
+            "backToRooms": "Back to private rooms",
+            "goOnline": "Go to online section",
+            "errors": {
+                "expired": "This room has expired.",
+                "unauthorized": "Your player token is missing or expired. Open the online section first.",
+                "load": "The room could not be loaded. Check your connection and try again.",
+                "move": "The move could not be applied. Reloading the current game state.",
+                "score": "The local score could not be saved persistently."
+            }
+        }
     },
     "rating": {
         "title": "How was your experience?",
