@@ -105,6 +105,12 @@
             "firstMove": "Der erste Zug geht an …",
             "startGame": "Spiel starten",
             "overwrite": "Das Spiel {{a}} vs {{b}} (gestartet am {{date}}) wird überschrieben."
+        },
+        "categories": {
+            "music": "Music",
+            "graphics": "Graphics & Icons",
+            "sound": "Sound Effects",
+            "project": "Project"
         }
     },
     "tutorial": {
@@ -137,8 +143,22 @@
     "online": {
         "queue": "Queue",
         "privateGame": "Privatesspiel",
+        "leaderboardTitle": "Bestenliste",
+        "leaderboardEmpty": "Noch keine Spieler vorhanden.",
+        "leaderboardError": "Die Bestenliste konnte nicht geladen werden.",
+        "activeUser": "Aktiv",
+        "inactiveUser": "Inaktiv",
         "playerInQueue": "Spieler Wartend",
-        "leaveQueue": "Spielersuche abbrechen"
+        "leaveQueue": "Spielersuche abbrechen",
+        "backToHome": "Zurück zur Startseite",
+        "checkingToken": "Spieler-Token wird überprüft…",
+        "signedInAs": "Du spielst als {{name}}",
+        "nicknameLabel": "Nickname",
+        "createUser": "Weiter",
+        "creatingUser": "Spieler wird erstellt…",
+        "invalidToken": "Dein gespeichertes Spieler-Token ist ungültig oder abgelaufen. Erstelle einen Spieler mit einem Spitznamen.",
+        "serverError": "Dein gespeichertes Token konnte nicht überprüft werden. Bitte prüfe die Verbindung und versuche es erneut.",
+        "createError": "Spieler konnte nicht erstellt werden. Bitte prüfe den Spitznamen und versuche es erneut."
     },
     "privateRoom": {
         "title": "Privater Raum",

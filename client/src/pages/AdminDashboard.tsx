@@ -79,10 +79,6 @@ function nightAmount(h: number): number {
   return 1 - (h - 5) / 2
 }
 
-/* ------------------------------------------------------------------ */
-/*  Terminal-Helfer für "3erReihe"                                     */
-/* ------------------------------------------------------------------ */
-
 const BOARD_LETTERS = ['a', 'b', 'c', 'd']
 
 function formatBoard(board: (Mark | null)[]): string[] {
@@ -120,10 +116,6 @@ function createFreshGame(first: Side): SavedGame {
     markB: 'O',
   } as SavedGame
 }
-
-/* ------------------------------------------------------------------ */
-/*  Fenster-Komponente (wiederverwendbar, verschiebbar)                */
-/* ------------------------------------------------------------------ */
 
 type WindowKind = 'default' | 'folder' | 'txt' | 'cmd'
 
@@ -209,10 +201,6 @@ function DraggableWindow({
     </section>
   )
 }
-
-/* ------------------------------------------------------------------ */
-/*  Analoge Uhr (interaktiv)                                           */
-/* ------------------------------------------------------------------ */
 
 function AnalogClock({
   hour,
@@ -356,14 +344,9 @@ function AnalogClock({
   )
 }
 
-/* ------------------------------------------------------------------ */
-/*  Desktop-Simulation nach erfolgreichem Login                        */
-/* ------------------------------------------------------------------ */
-
 export default function AdminDashboard() {
   const { lang } = useParams()
 
-  // Kein Login? → auf Unauthorized umleiten
   if (!sessionStorage.getItem('adminUser')) {
     return <Navigate to={`/${lang}/401`} replace />
   }
@@ -565,8 +548,9 @@ function AdminDesktop() {
     return `${h12}:${mm} ${h >= 12 ? 'PM' : 'AM'}`
   })()
 
-  return (
-    <div className="desktop">
+return (
+  <div className="desktop">
+    <div className="desktop-screen">
       <div
         className="desktop-sky"
         aria-hidden="true"
@@ -928,5 +912,6 @@ function AdminDesktop() {
         </button>
       </div>
     </div>
-  )
+  </div>
+)
 }

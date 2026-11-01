@@ -110,24 +110,35 @@
   border-left-color: #d9644f;
 }
 
-/* ------------------------------------------------------------------ */
-/*  Desktop-Simulation                                                 */
-/* ------------------------------------------------------------------ */
-
 .desktop {
   position: relative;
   height: 100vh;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   font-family: 'Segoe UI', Tahoma, 'Helvetica Neue', system-ui, sans-serif;
   color: #fff;
   user-select: none;
+  background: #1a1208;
+  scrollbar-gutter: stable;
 }
 
-/* ---------- Hintergrund: Himmel, Sonne, Wolken, Hügel ---------- */
+.desktop::-webkit-scrollbar { width: 8px; }
+.desktop::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.35); }
+.desktop::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.desktop-screen {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+}
 
 .desktop-sky {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  width: 100%;
+  height: 100vh;
   overflow: hidden;
   background: linear-gradient(180deg, #1c5fa8 0%, #3d8fd4 35%, #8ec9ef 68%, #d3e9f8 100%);
 }
@@ -149,7 +160,28 @@
   box-shadow: 0 0 90px 45px rgba(255, 235, 150, 0.45);
 }
 
-/* ---------- Wolken-Endlos-Scroller ---------- */
+.desktop::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100vh;
+  background:
+    linear-gradient(180deg,
+      rgba(0, 0, 0, 0.65) 0%,
+      rgba(0, 0, 0, 0) 18%
+    ),
+    linear-gradient(180deg,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0.55) 100%
+    ),
+repeating-linear-gradient(
+  180deg,
+  #4a3420 0, #4a3420 3rem,
+  #2e1e10 3rem, #2e1e10 6rem
+);
+
+  box-shadow: inset 0 60px 90px -50px rgba(0, 0, 0, 0.75);
+}
 
 .desktop-clouds {
   position: absolute;
@@ -241,7 +273,9 @@
   left: -30%;
   width: 130%;
   height: 92%;
-  background: linear-gradient(180deg, #a8dd75 0%, #6cb03a 45%, #3d7c22 100%);
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, 0.22) 100%),
+    linear-gradient(180deg, #a8dd75 0%, #6cb03a 45%, #3d7c22 100%);
 }
 
 .desktop-hill--near {
@@ -249,10 +283,11 @@
   right: -35%;
   width: 120%;
   height: 90%;
-  background: linear-gradient(180deg, #8ccf55 0%, #4e8f2c 55%, #2c6218 100%);
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.32) 100%),
+    linear-gradient(180deg, #8ccf55 0%, #4e8f2c 55%, #2c6218 100%);
 }
 
-/* ---------- Desktop-Icons ---------- */
 
 .desktop-icons {
   position: absolute;
@@ -328,8 +363,6 @@
   box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.35);
 }
 
-/* ---------- Fenster ---------- */
-
 .desktop-window-layer {
   position: absolute;
   inset: 0 0 44px 0;
@@ -351,7 +384,6 @@
   color: #16233a;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
   animation: desktop-window-in 0.18s ease-out;
-  /* transform wird inline gesetzt */
 }
 
 @keyframes desktop-window-in {
@@ -469,8 +501,6 @@
   outline-offset: 2px;
 }
 
-/* ---------- Taskleiste ---------- */
-
 .desktop-taskbar {
   position: absolute;
   left: 0;
@@ -571,8 +601,6 @@
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
 }
-
-/* ---------- Startmenü ---------- */
 
 .desktop-start.is-open {
   background: linear-gradient(180deg, #478f1b 0%, #63b42f 45%, #8ed15c 100%);
@@ -709,8 +737,6 @@
     linear-gradient(180deg, #4aa3e8, #1c5fa8);
 }
 
-/* ---------- Fenster-Icons (Varianten) ---------- */
-
 .desktop-window-icon--txt {
   border-color: #6a8fb8;
   background: linear-gradient(180deg, #fff, #e8eef6);
@@ -734,8 +760,6 @@
   font-size: 0.55rem;
   line-height: 1;
 }
-
-/* ---------- Explorer-Fenster (Ordner-Inhalt) ---------- */
 
 .desktop-window-body--explorer {
   display: flex;
@@ -810,8 +834,6 @@
   box-shadow: 0 5px 0 #8aa4c4, 0 10px 0 #8aa4c4, 0 15px 0 #b0c2d8;
 }
 
-/* ---------- Notepad-Fenster (README) ---------- */
-
 .desktop-window-body--notepad {
   padding: 0;
   gap: 0;
@@ -828,8 +850,6 @@
   line-height: 1.55;
   white-space: pre-wrap;
 }
-
-/* ---------- Terminal-Fenster (cmd) ---------- */
 
 .desktop-window-body--cmd {
   padding: 0;
@@ -881,8 +901,6 @@
   outline: none;
 }
 
-/* ---------- Startmenü-Eintrag für cmd ---------- */
-
 .desktop-startmenu-icon--cmd {
   position: relative;
   border: 1px solid #111;
@@ -921,8 +939,6 @@
   background: linear-gradient(180deg, #ffdf9c, #f0b843);
 }
 
-/* ---------- Tag/Nacht Elemente ---------- */
-
 .desktop-sun {
   transition: opacity 1.2s ease;
 }
@@ -954,8 +970,6 @@
   box-shadow: 0 0 5px rgba(255, 255, 255, 0.9);
   animation: desktop-star-twinkle 3.4s ease-in-out infinite;
 }
-
-/* ---------- Sternschnuppen ---------- */
 
 .desktop-meteors {
   position: absolute;
@@ -1039,8 +1053,6 @@
   transition: filter 1.2s ease;
 }
 
-/* ---------- Uhr-Button (Tray) ---------- */
-
 button.desktop-tray {
   appearance: none;
   -webkit-appearance: none;
@@ -1072,8 +1084,6 @@ button.desktop-tray:focus-visible {
   margin-left: 0.4rem;
   color: #ffd45e;
 }
-
-/* ---------- Uhrzeit-Overlay ---------- */
 
 .desktop-clock-backdrop {
   position: absolute;

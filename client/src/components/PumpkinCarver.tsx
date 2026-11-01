@@ -17,6 +17,7 @@ const MIN_STEP = 2
 const CLOSE_DISTANCE = 40
 const MIN_SHAPE_LENGTH = CLOSE_DISTANCE * 3
 const SOUND_INTERVAL_MS = 120
+const PUMPKIN_DATE_CHECK_ENABLED = false //damit das gimick auch später funktioniert
 
 const KNIFE_SIZE = 30
 const KNIFE_HOTSPOT: Point = {
@@ -27,6 +28,13 @@ const KNIFE_HOTSPOT: Point = {
 const CARVE_VOLUME = 0.2
 
 let carveAudio: HTMLAudioElement | null = null
+
+function shouldShowPumpkin(date = new Date()): boolean {
+  if (!PUMPKIN_DATE_CHECK_ENABLED) return true
+
+  const monthDay = (date.getMonth() + 1) * 100 + date.getDate()
+  return monthDay >= 1024 && monthDay <= 1107
+}
 
 function getCarveAudio(): HTMLAudioElement {
   if (!carveAudio) {
@@ -349,6 +357,8 @@ export default function PumpkinCarver() {
       </div>
     </div>
   )
+
+  if (!shouldShowPumpkin()) return null
 
   return (
     <>

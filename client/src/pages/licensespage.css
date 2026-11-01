@@ -44,62 +44,111 @@
   border-bottom-color: var(--accent);
 }
 
-/* --- LIZENZEN KARTE --- */
-.licenses-card {
+/* --- SEITE --- */
+.licenses-main {
+  justify-content: flex-start;
+  align-items: stretch;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 2rem clamp(1rem, 4vw, 4rem) 3rem;
+  gap: 2rem;
+}
+
+.license-entry p,
+.license-entry ul {
+  max-width: 75ch;
+}
+
+.licenses-header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* --- RASTER: 2 Karten pro Reihe, gleiche Höhe je Reihe --- */
+.licenses-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+/* --- KATEGORIE-KARTE --- */
+.license-category {
+  display: flex;
+  flex-direction: column;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 2rem;
-  max-width: 600px;
-  width: 100%;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
-  margin-top: 2rem;
-  margin-bottom: 4rem;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
-.licenses-card h1 {
-  margin-top: 0;
-  margin-bottom: 1.5rem;
-  font-size: 1.5rem;
+.license-category__header {
+  padding: 0.9rem 1.5rem;
   border-bottom: 1px solid var(--border);
-  padding-bottom: 0.75rem;
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
 }
 
-.license-section {
-  margin-bottom: 2rem;
-}
-
-.license-section:last-child {
-  margin-bottom: 0;
-}
-
-.license-section h2 {
-  font-size: 1.1rem;
-  margin-bottom: 0.75rem;
+.license-category__header h2 {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--accent);
 }
 
-.license-section p {
-  margin: 0 0 0.5rem 0;
+.license-category__body {
+  flex: 1;
+  padding: 0.5rem 1.5rem 1rem;
+}
+
+/* --- EINTRÄGE IN EINER KARTE --- */
+.license-entry {
+  padding: 1rem 0;
+}
+
+.license-entry + .license-entry {
+  border-top: 1px solid var(--border);
+}
+
+.license-entry h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.license-entry p {
+  margin: 0 0 0.5rem;
   line-height: 1.5;
 }
 
-.license-section ul {
+.license-entry ul {
   margin: 0;
   padding-left: 1.25rem;
   line-height: 1.6;
+  font-size: 0.92rem;
 }
 
-.license-section a {
+.license-entry a {
   color: var(--accent);
   text-decoration: underline;
+  overflow-wrap: anywhere;
 }
 
-.license-section a:hover {
+.license-entry a:hover {
   filter: brightness(0.8);
 }
 
-.license-section--inspiration {
-  border-left: 3px solid var(--accent);
-  padding-left: 1rem;
+/* --- RESPONSIVE --- */
+@media (max-width: 800px) {
+  .licenses-main {
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  .licenses-grid {
+    grid-template-columns: 1fr;
+  }
 }

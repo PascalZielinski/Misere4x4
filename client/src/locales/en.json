@@ -65,6 +65,12 @@
             "intro": "The Halloween gimmick on this site is inspired by <author>Neal Agarwal</author> and his playful web experiments.",
             "note": "Interactive, playful web experiences like “Halloween” on neal.fun served as a reference for the spooky effect.",
             "credit": "Many thanks to <neal>neal.fun</neal> for the inspiration – the actual code is of course ours, only the idea was kindly “borrowed”."
+        },
+        "categories": {
+            "music": "Music",
+            "graphics": "Graphics & Icons",
+            "sound": "Sound Effects",
+            "project": "Project"
         }
     },
     "local": {
@@ -137,8 +143,22 @@
     "online": {
         "queue": "Queue",
         "privateGame": "Private Game",
+        "leaderboardTitle": "Leaderboard",
+        "leaderboardEmpty": "No players yet.",
+        "leaderboardError": "Leaderboard could not be loaded.",
+        "activeUser": "Active",
+        "inactiveUser": "Inactive",
         "playerInQueue": "Waiting Game",
-        "leaveQueue": "Leave Queue"
+        "leaveQueue": "Leave Queue",
+        "backToHome": "Back to home",
+        "checkingToken": "Checking player token…",
+        "signedInAs": "Youre Playing as {{name}}",
+        "nicknameLabel": "Nickname",
+        "createUser": "Continue",
+        "creatingUser": "Creating player…",
+        "invalidToken": "Your saved player token is invalid or expired. Create a player with a nickname.",
+        "serverError": "Could not verify your saved token. Check your connection and try again.",
+        "createError": "Could not create your player. Check the nickname and try again."
     },
     "privateRoom": {
         "title": "Private Room",

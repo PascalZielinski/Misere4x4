@@ -17,5 +17,5 @@ security:
                 token_handler: App\Security\UserTokenHandler
 
     access_control:
-        - { path: ^/api/user$, methods: [POST], roles: PUBLIC_ACCESS }
+        - { path: ^/api/users$, methods: [GET, POST], roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }

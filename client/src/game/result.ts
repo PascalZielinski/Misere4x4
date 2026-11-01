@@ -18,8 +18,68 @@ export type GameResult =
   | { status: 'draw' }
   | { status: 'lost'; loser: Side; chains: Chain[] }
 
+// Alle 24 Dreierfenster. Jede 4er-Gruppe ist eine Brettzeile,
+// 1 = Feld gehört zum Fenster. Feld oben links = höchstes Bit.
+// Nur gültig für SIZE = 4.
+const WINDOWS: readonly number[] = [
+  // waagerecht (8)
+  0b1110_0000_0000_0000,
+  0b0111_0000_0000_0000,
+  0b0000_1110_0000_0000,
+  0b0000_0111_0000_0000,
+  0b0000_0000_1110_0000,
+  0b0000_0000_0111_0000,
+  0b0000_0000_0000_1110,
+  0b0000_0000_0000_0111,
+
+  // senkrecht (8)
+  0b1000_1000_1000_0000,
+  0b0100_0100_0100_0000,
+  0b0010_0010_0010_0000,
+  0b0001_0001_0001_0000,
+  0b0000_1000_1000_1000,
+  0b0000_0100_0100_0100,
+  0b0000_0010_0010_0010,
+  0b0000_0001_0001_0001,
+
+  // diagonal \ (4)
+  0b1000_0100_0010_0000,
+  0b0100_0010_0001_0000,
+  0b0000_1000_0100_0010,
+  0b0000_0100_0010_0001,
+
+  // diagonal / (4)
+  0b0010_0100_1000_0000,
+  0b0001_0010_0100_0000,
+  0b0000_0010_0100_1000,
+  0b0000_0001_0010_0100,
+]
+
 const inBoard = (r: number, c: number) => r >= 0 && r < SIZE && c >= 0 && c < SIZE
 
+// Brettindex (zeile * SIZE + spalte) -> Bitmaske. Index 0 = höchstes Bit.
+const bitOf = (index: number) => 1 << (SIZE * SIZE - 1 - index)
+
+// Pro Zeichen eine Bitmaske der belegten Felder.
+function toMasks(board: (Mark | null)[]): Map<Mark, number> {
+  const masks = new Map<Mark, number>()
+  board.forEach((mark, i) => {
+    if (mark) masks.set(mark, (masks.get(mark) ?? 0) | bitOf(i))
+  })
+  return masks
+}
+
+function hasThree(stones: number): boolean {
+  return WINDOWS.some((w) => (stones & w) === w)
+}
+
+// Ein Fenster ist tot, wenn beide Spieler darin Steine haben.
+function canStillMakeThree(masks: Map<Mark, number>): boolean {
+  const all = [...masks.values()]
+  return WINDOWS.some((w) => all.filter((m) => (m & w) !== 0).length <= 1)
+}
+
+// Nur für die Darstellung: komplette Kette (auch länger als 3) durch das letzte Feld.
 function chainsThrough(board: (Mark | null)[], index: number): Chain[] {
   const mark = board[index]
   if (!mark) return []
@@ -44,31 +104,18 @@ function chainsThrough(board: (Mark | null)[], index: number): Chain[] {
   return chains
 }
 
-function canStillMakeThree(board: (Mark | null)[]): boolean {
-  for (let r = 0; r < SIZE; r++) {
-    for (let c = 0; c < SIZE; c++) {
-      for (const { dr, dc } of DIRS) {
-        if (!inBoard(r + 2 * dr, c + 2 * dc)) continue
-        const marks = new Set<Mark>()
-        for (let k = 0; k < 3; k++) {
-          const m = board[(r + k * dr) * SIZE + (c + k * dc)]
-          if (m) marks.add(m)
-        }
-        if (marks.size <= 1) return true
-      }
-    }
-  }
-  return false
-}
-
 export function getResult(game: SavedGame): GameResult {
   const last = game.moves[game.moves.length - 1]
   if (!last) return { status: 'playing' }
 
-  const chains = chainsThrough(game.board, last.index)
-  if (chains.length > 0) return { status: 'lost', loser: last.side, chains }
+  const masks = toMasks(game.board)
+  const lastMark = game.board[last.index]
 
-  if (!canStillMakeThree(game.board)) return { status: 'draw' }
+  if (lastMark && hasThree(masks.get(lastMark) ?? 0)) {
+    return { status: 'lost', loser: last.side, chains: chainsThrough(game.board, last.index) }
+  }
+
+  if (!canStillMakeThree(masks)) return { status: 'draw' }
   return { status: 'playing' }
 }
 

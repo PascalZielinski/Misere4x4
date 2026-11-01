@@ -40,6 +40,9 @@ class User implements UserInterface
     #[ORM\Column(options: ['default' => true])]
     private bool $active = true;
 
+    #[ORM\Column(length: 255)]
+    private ?string $usedToken = null;
+
     public function __construct()
     {
         $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
@@ -138,5 +141,17 @@ class User implements UserInterface
 
     public function eraseCredentials(): void
     {
+    }
+
+    public function getUsedToken(): ?string
+    {
+        return $this->usedToken;
+    }
+
+    public function setUsedToken(string $usedToken): static
+    {
+        $this->usedToken = $usedToken;
+
+        return $this;
     }
 }
