@@ -11,10 +11,9 @@ i18n.use(initReactI18next).init({
   },
   lng: DEFAULT_LANG,
   fallbackLng: DEFAULT_LANG,
-  interpolation: { escapeValue: false }, // React escaped schon selbst
+  interpolation: { escapeValue: false },
 })
 
-// <html lang="..."> aktuell halten + Wahl merken
 i18n.on("languageChanged", (lng) => {
   document.documentElement.lang = lng
   localStorage.setItem("lang", lng)

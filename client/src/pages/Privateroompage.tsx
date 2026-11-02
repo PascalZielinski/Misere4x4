@@ -1,3 +1,5 @@
+//#region Imports
+// MARK: - Imports
 import { useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { useTranslation } from 'react-i18next'
@@ -5,14 +7,22 @@ import './Privateroompage.css'
 import NavBar from '../components/NavBar'
 import LocalizedLink from '../components/LocalizedLink'
 import { createRoom, joinRoom, PrivateRoomApiError } from '../api/privateRooms'
+//#endregion
 
+//#region Private room configuration
+// MARK: - Private room configuration
 const CODE_LENGTH = 6
 const LEGACY_CODE_LENGTH = 4
 
 type JoinError = 'invalid' | 'notFound' | 'unauthorized' | 'generic' | null
 type Busy = 'creating' | 'joining' | null
+//#endregion
 
+//#region Private room page
+// MARK: - Private room page
 export default function PrivateRoomPage() {
+  //#region Form state
+  // MARK: Form state
   const { t } = useTranslation()
   const { lang } = useParams()
   const navigate = useNavigate()
@@ -22,7 +32,10 @@ export default function PrivateRoomPage() {
   const [joinError, setJoinError] = useState<JoinError>(null)
   const [createFailed, setCreateFailed] = useState<'unauthorized' | 'generic' | null>(null)
   const [busy, setBusy] = useState<Busy>(null)
+  //#endregion
 
+  //#region Room actions
+  // MARK: Room actions
   const onCreateRoom = async () => {
     if (busy) return
     setBusy('creating')
@@ -62,6 +75,10 @@ export default function PrivateRoomPage() {
 
   const activeIndex = Math.min(code.length, CODE_LENGTH - 1)
 
+  //#endregion
+
+  //#region Render
+  // MARK: Render
   return (
     <div className="landing">
       <NavBar />
@@ -74,7 +91,6 @@ export default function PrivateRoomPage() {
           </header>
 
           <div className="private-room__grid">
-            {/* Raum erstellen */}
             <section className="private-room__card" aria-labelledby="pr-create-title">
               <div className="private-room__icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="28" height="28" fill="none"
@@ -110,7 +126,6 @@ export default function PrivateRoomPage() {
               <span>{t('privateRoom.or')}</span>
             </div>
 
-            {/* Raum beitreten */}
             <form
               className="private-room__card"
               onSubmit={onJoin}
@@ -212,4 +227,6 @@ export default function PrivateRoomPage() {
       </footer>
     </div>
   )
+  //#endregion
 }
+//#endregion

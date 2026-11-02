@@ -1,13 +1,26 @@
+//#region Imports
+// MARK: - Imports
 import { useTranslation } from 'react-i18next'
 import LocalizedLink from '../components/LocalizedLink'
 import './401.css'
+//#endregion
 
+//#region Page constants
+// MARK: - Page constants
 const ROWS = 15
 const ITEMS = 30
+//#endregion
 
+//#region Unauthorized page
+// MARK: - Unauthorized page
 export default function Unauthorized() {
+  //#region Translations
+  // MARK: Translations
   const { t } = useTranslation()
+  //#endregion
 
+  //#region Render
+  // MARK: Render
   return (
     <div className="unauthorized">
       <div className="unauthorized-bg" aria-hidden="true">
@@ -44,4 +57,6 @@ export default function Unauthorized() {
       </div>
     </div>
   )
+  //#endregion
 }
+//#endregion

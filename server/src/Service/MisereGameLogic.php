@@ -4,9 +4,15 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+// #region Imports
+// MARK: - Imports
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
+// #endregion
+
+// #region Game state types
+// MARK: - Game state types
 /**
  * @phpstan-type Side 'A'|'B'
  * @phpstan-type Mark 'X'|'O'
@@ -22,8 +28,11 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
  *     result: GameResult
  * }
  */
+// #endregion
 final class MisereGameLogic
 {
+    // #region Board configuration
+    // MARK: - Board configuration
     private const WINDOWS = [
         [0, 1, 2], [1, 2, 3], [4, 5, 6], [5, 6, 7],
         [8, 9, 10], [9, 10, 11], [12, 13, 14], [13, 14, 15],
@@ -39,7 +48,10 @@ final class MisereGameLogic
         [1, 1, 45],
         [1, -1, -45],
     ];
+    // #endregion
 
+    // #region Game state creation
+    // MARK: - Game state creation
     /**
      * @return GameState
      */
@@ -73,7 +85,10 @@ final class MisereGameLogic
             'result' => ['status' => 'playing'],
         ];
     }
+    // #endregion
 
+    // #region Move handling
+    // MARK: - Move handling
     /**
      * @param GameState $game
      * @param Side      $side
@@ -104,7 +119,10 @@ final class MisereGameLogic
 
         return $game;
     }
+    // #endregion
 
+    // #region Result evaluation
+    // MARK: - Result evaluation
     /**
      * @param list<Mark|null> $board
      * @param Side            $side
@@ -168,4 +186,5 @@ final class MisereGameLogic
     {
         return $row >= 0 && $row < 4 && $column >= 0 && $column < 4;
     }
+    // #endregion
 }

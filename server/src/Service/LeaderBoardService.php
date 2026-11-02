@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+// #region Imports
+// MARK: - Imports
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
@@ -10,19 +12,29 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+// #endregion
+
 final readonly class LeaderBoardService
 {
+    // #region Validation configuration
+    // MARK: - Validation configuration
     // Nur mockup kein gibt kein echten wirklichen grund hier mit irgenwelchen packages api oder sonst was zu arbeiten
     private const BAD_WORDS = ['badword1', 'badword2', 'badword3'];
     private const LEET = ['0' => 'o', '1' => 'i', '3' => 'e', '4' => 'a', '5' => 's', '@' => 'a', '$' => 's'];
+    // #endregion
 
+    // #region Dependencies
+    // MARK: - Dependencies
     public function __construct(
         private EntityManagerInterface $entityManager,
         private UserRepository $userRepository,
         private ValidatorInterface $validator,
     ) {
     }
+    // #endregion
 
+    // #region User creation
+    // MARK: - User creation
     /**
      * @param array<string, mixed> $data
      *
@@ -43,7 +55,10 @@ final readonly class LeaderBoardService
 
         return $this->userData($user);
     }
+    // #endregion
 
+    // #region Name validation
+    // MARK: - Name validation
     private function validateName(User $user): void
     {
         $text = strtr((string) $user->getName(), ['ä' => 'a', 'ö' => 'o', 'ü' => 'u', 'ß' => 'ss']);
@@ -61,7 +76,10 @@ final readonly class LeaderBoardService
             throw new UnprocessableEntityHttpException((string) $violations->get(0)->getMessage());
         }
     }
+    // #endregion
 
+    // #region User queries
+    // MARK: - User queries
     /**
      * @return array<array-key, array{name: string|null, score: int, createdAt: string|null, active: bool}>
      */
@@ -82,7 +100,10 @@ final readonly class LeaderBoardService
 
         return $this->formatUsers($this->userRepository->searchByNameOrderedByScore($name));
     }
+    // #endregion
 
+    // #region Response formatting
+    // MARK: - Response formatting
     /**
      * @param array<User> $users
      *
@@ -114,4 +135,5 @@ final readonly class LeaderBoardService
             'lastSeenAt' => $user->getLastSeenAt()?->format('d.m.Y H:i:s'),
         ];
     }
+    // #endregion
 }

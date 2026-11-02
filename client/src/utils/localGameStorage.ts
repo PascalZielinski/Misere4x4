@@ -56,7 +56,6 @@ export function loadGame(): SavedGame | null {
         markA: swapped ? 'O' : 'X',
         markB: swapped ? 'X' : 'O',
         firstPlayer,
-        // ältere Spielstände ohne Zug: der Startspieler ist dran
         turn: parsed.turn === 'A' || parsed.turn === 'B' ? parsed.turn : firstPlayer,
         board: parseBoard(parsed.board),
         moves: parseMoves(parsed.moves),
@@ -76,7 +75,7 @@ export function saveGame(game: SavedGame): void {
   try {
     localStorage.setItem(KEY, JSON.stringify(game))
   } catch {
-    // Speicher voll oder gesperrt: Spiel läuft trotzdem weiter
+    
   }
 }
 
@@ -84,6 +83,6 @@ export function clearGame(): void {
   try {
     localStorage.removeItem(KEY)
   } catch {
-    /* ignorieren */
+    
   }
 }

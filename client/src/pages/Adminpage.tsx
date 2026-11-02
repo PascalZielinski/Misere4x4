@@ -1,3 +1,5 @@
+//#region Imports
+// MARK: - Imports
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router'
 import { useTranslation } from 'react-i18next'
@@ -5,21 +7,34 @@ import NavBar from '../components/NavBar'
 import { useAudioSettings } from '../utils/audioSettings'
 import musicSrc from '../assets/samuelfjohanns-obey-your-mechanic-majesty-03-108930.mp3'
 import './Adminpage.css'
+//#endregion
 
+//#region Login configuration
+// MARK: - Login configuration
 const PASSWORD = 'LOUVRE'
+//#endregion
 
+//#region Admin page
+// MARK: - Admin page
 export default function AdminPage() {
+  //#region Session redirect
+  // MARK: Session redirect
   const { lang } = useParams()
 
-  // Bereits eingeloggt? → sofort weiter zum Dashboard
   if (sessionStorage.getItem('adminUser')) {
     return <Navigate to={`/${lang}/admin/dashboard`} replace />
   }
+  //#endregion
 
   return <AdminLogin />
 }
+//#endregion
 
+//#region Admin login
+// MARK: - Admin login
 function AdminLogin() {
+  //#region Login state
+  // MARK: Login state
   const { t } = useTranslation()
   const { lang } = useParams()
   const navigate = useNavigate()
@@ -29,7 +44,10 @@ function AdminLogin() {
 
   const musicRef = useRef<HTMLAudioElement>(null)
   const { music } = useAudioSettings()
+  //#endregion
 
+  //#region Audio lifecycle
+  // MARK: Audio lifecycle
   useEffect(() => {
     if (musicRef.current) musicRef.current.volume = music / 100
   }, [music])
@@ -61,7 +79,10 @@ function AdminLogin() {
       a.currentTime = 0
     }
   }, [])
+  //#endregion
 
+  //#region Login action
+  // MARK: Login action
   const submit = (e: FormEvent) => {
     e.preventDefault()
     if (password === PASSWORD) {
@@ -72,7 +93,10 @@ function AdminLogin() {
       setPassword('')
     }
   }
+  //#endregion
 
+  //#region Render
+  // MARK: Render
   return (
     <div className="admin">
       <audio ref={musicRef} src={musicSrc} preload="auto" loop hidden />
@@ -127,4 +151,6 @@ function AdminLogin() {
       </main>
     </div>
   )
+  //#endregion
 }
+//#endregion

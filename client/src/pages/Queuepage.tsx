@@ -1,3 +1,5 @@
+//#region Imports
+// MARK: - Imports
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { useTranslation } from 'react-i18next'
@@ -5,15 +7,23 @@ import './Onlinepage.css'
 import NavBar from '../components/NavBar'
 import LocalizedLink from '../components/LocalizedLink'
 import { getQueueStatus, joinQueue, leaveQueue, type QueueState } from '../api/queue'
+//#endregion
 
+//#region Queue page
+// MARK: - Queue page
 export default function QueuePage() {
+  //#region Queue state
+  // MARK: Queue state
   const { t } = useTranslation()
   const { lang } = useParams()
   const navigate = useNavigate()
   const [queueState, setQueueState] = useState<QueueState | null>(null)
   const [error, setError] = useState(false)
   const [leaving, setLeaving] = useState(false)
+  //#endregion
 
+  //#region Queue lifecycle
+  // MARK: Queue lifecycle
   const applyQueueState = useCallback((next: QueueState) => {
     setQueueState(next)
     if (next.status === 'matched' && next.roomUuid) {
@@ -52,7 +62,10 @@ export default function QueuePage() {
       window.clearInterval(interval)
     }
   }, [applyQueueState])
+  //#endregion
 
+  //#region Queue actions
+  // MARK: Queue actions
   const onLeaveQueue = async () => {
     setLeaving(true)
     try {
@@ -63,7 +76,10 @@ export default function QueuePage() {
       setLeaving(false)
     }
   }
+  //#endregion
 
+  //#region Render
+  // MARK: Render
   return (
     <div className="landing">
       <NavBar />
@@ -104,4 +120,6 @@ export default function QueuePage() {
       </footer>
     </div>
   )
+  //#endregion
 }
+//#endregion

@@ -76,7 +76,7 @@
         },
         "task": {
             "title": "Assignment",
-            "text": "The idea, rules and sketch are taken from the application assignment “Drei in einer Reihe.pdf” by <adesso>adesso SE</adesso>."
+            "text": "The idea, rules and sketch are taken from the application assignment “Drei in einer Reihe” by <adesso>adesso SE</adesso>."
         },
         "pixabaySound": {
             "title": "Sound effect (Pixabay)",
@@ -85,9 +85,8 @@
         },
         "inspiration": {
             "title": "Inspiration",
-            "intro": "The Halloween gimmick on this site is inspired by <author>Neal Agarwal</author> and his playful web experiments.",
-            "note": "Interactive, playful web experiences like “Halloween” on neal.fun served as a reference for the spooky effect.",
-            "credit": "Many thanks to <neal>neal.fun</neal> for the inspiration – the actual code is of course ours, only the idea was kindly “borrowed”."
+            "intro": "The Halloween gimmick on this site is inspired by <author>Neal Agarwal</author>",
+            "credit": "The implementation simply recreated the inspiration."
         },
         "categories": {
             "music": "Music",
@@ -98,9 +97,7 @@
         "freesoundSound": {
             "title": "Sound Effect (freesound_community)",
             "intro": "Sound Effect by <author>freesound_community</author> from <pixabay>Pixabay</pixabay>.",
-            "license": "Pixabay Content License",
-            "thanks": "Say “thanks” to freesound_community! This helps keep the creative spirit going!",
-            "licenseNote": "By downloading, you agree to our <license>License</license>."
+            "license": "Pixabay Content License"
         }
     },
     "local": {
@@ -275,7 +272,7 @@
         "star": "Star",
         "stars": "Stars",
         "comment": "Comment (optional)",
-        "placeholder": "What did you like? What could we improve?",
+        "placeholder": "What did you like? What should i improve?",
         "submit": "Submit",
         "sending": "Sending…",
         "success": "Thank you for your feedback!",

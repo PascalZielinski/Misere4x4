@@ -2,7 +2,7 @@ import { useSyncExternalStore } from 'react'
 
 const KEY = 'audioSettings'
 
-type Settings = { sound: number; music: number } // 0-100
+type Settings = { sound: number; music: number }
 
 function load(): Settings {
   try {
@@ -15,7 +15,7 @@ function load(): Settings {
       }
     }
   } catch {
-    // ignorieren
+
   }
   return { sound: 100, music: 100 }
 }
@@ -37,7 +37,7 @@ function update(patch: Partial<Settings>) {
   try {
     localStorage.setItem(KEY, JSON.stringify(settings))
   } catch {
-    // ignorieren
+    
   }
   listeners.forEach((l) => l())
 }
@@ -50,7 +50,6 @@ export function setMusicVolume(v: number) {
   update({ music: v })
 }
 
-// Für Nicht-React-Code (z. B. beim Abspielen): Wert 0-1
 export function getSoundGain(): number {
   return settings.sound / 100
 }

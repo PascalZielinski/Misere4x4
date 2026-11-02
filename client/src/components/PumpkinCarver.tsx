@@ -17,7 +17,7 @@ const MIN_STEP = 2
 const CLOSE_DISTANCE = 40
 const MIN_SHAPE_LENGTH = CLOSE_DISTANCE * 3
 const SOUND_INTERVAL_MS = 120
-const PUMPKIN_DATE_CHECK_ENABLED = false //damit das gimick auch später funktioniert
+const PUMPKIN_DATE_CHECK_ENABLED = false
 
 const KNIFE_SIZE = 30
 const KNIFE_HOTSPOT: Point = {

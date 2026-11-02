@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+// #region Imports
+// MARK: - Imports
 use App\Entity\QueueEntry;
 use App\Entity\Room;
 use App\Entity\RoomParticipant;
@@ -20,12 +22,19 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 
+// #endregion
+
 final readonly class PrivateRoomService
 {
+    // #region Room configuration
+    // MARK: - Room configuration
     private const WAITING_TTL_SECONDS = 600;
     private const TURN_TTL_SECONDS = 60;
     private const ROOM_CODE_SELECTION_ATTEMPTS = 32;
+    // #endregion
 
+    // #region Dependencies
+    // MARK: - Dependencies
     public function __construct(
         private ManagerRegistry $doctrine,
         private MatchmakingService $matchmaking,
@@ -33,7 +42,10 @@ final readonly class PrivateRoomService
         private HubInterface $hub,
     ) {
     }
+    // #endregion
 
+    // #region Room actions
+    // MARK: - Room actions
     /**
      * @return array<string, mixed>
      */
@@ -251,7 +263,10 @@ final readonly class PrivateRoomService
 
         return $state;
     }
+    // #endregion
 
+    // #region Room expiration and lookup
+    // MARK: - Room expiration and lookup
     private function removeExpiredRooms(): void
     {
         $expired = $this->rooms()->findExpired($this->now());
@@ -324,7 +339,10 @@ final readonly class PrivateRoomService
         return $room->getExpiresAt()
             ?? throw new \LogicException('The room expiration time is not configured.');
     }
+    // #endregion
 
+    // #region Persistence and participant locking
+    // MARK: - Persistence and participant locking
     private function entityManager(): EntityManagerInterface
     {
         $manager = $this->doctrine->getManager();
@@ -402,7 +420,10 @@ final readonly class PrivateRoomService
             }
         }
     }
+    // #endregion
 
+    // #region Participant validation
+    // MARK: - Participant validation
     private function assertCanStartGame(User $user, ?int $exceptRoomId = null): void
     {
         if ($this->rooms()->findActiveForUser($user, $this->now(), $exceptRoomId) instanceof Room) {
@@ -441,7 +462,10 @@ final readonly class PrivateRoomService
 
         return null;
     }
+    // #endregion
 
+    // #region Room response and updates
+    // MARK: - Room response and updates
     /**
      * @return array<string, mixed>
      */
@@ -489,4 +513,5 @@ final readonly class PrivateRoomService
     {
         return new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
     }
+    // #endregion
 }

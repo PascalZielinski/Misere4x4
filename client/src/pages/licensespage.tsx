@@ -1,9 +1,14 @@
+//#region Imports
+// MARK: - Imports
 import type { ReactNode } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import NavBar from '../components/NavBar'
 import LocalizedLink from '../components/LocalizedLink'
 import './licensespage.css'
+//#endregion
 
+//#region License components
+// MARK: - License components
 function ExtLink({ href, children }: { href: string; children?: ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
@@ -12,6 +17,8 @@ function ExtLink({ href, children }: { href: string; children?: ReactNode }) {
   )
 }
 
+//#region License category card
+// MARK: License category card
 function CategoryCard({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="license-category">
@@ -22,7 +29,10 @@ function CategoryCard({ title, children }: { title: string; children: ReactNode 
     </section>
   )
 }
+//#endregion
 
+//#region License entry
+// MARK: License entry
 function Entry({ title, children }: { title?: string; children: ReactNode }) {
   return (
     <article className="license-entry">
@@ -31,16 +41,28 @@ function Entry({ title, children }: { title?: string; children: ReactNode }) {
     </article>
   )
 }
+//#endregion
+//#endregion
 
+//#region License page data
+// MARK: - License page data
 const PIXABAY_SFX =
   'https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=108930'
 const PIXABAY_AUTHOR =
   'https://pixabay.com/de/users/samuelfjohanns-1207793/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=108930'
 const FREESOUND_AUTHOR = 'https://pixabay.com/users/freesound_community-46691455/'
+//#endregion
 
+//#region Licenses page
+// MARK: - Licenses page
 export default function LicensesPage() {
+  //#region Translations
+  // MARK: Translations
   const { t } = useTranslation()
+  //#endregion
 
+  //#region Render
+  // MARK: Render
   return (
     <div className="landing">
       <NavBar />
@@ -51,7 +73,6 @@ export default function LicensesPage() {
         </header>
 
         <div className="licenses-grid">
-          {/* --- MUSIK --- */}
           <CategoryCard title={t('licenses.categories.music')}>
             <Entry title={t('licenses.music.title')}>
               <p>
@@ -76,7 +97,6 @@ export default function LicensesPage() {
             </Entry>
           </CategoryCard>
 
-          {/* --- GRAFIKEN --- */}
           <CategoryCard title={t('licenses.categories.graphics')}>
             <Entry title={t('licenses.icons.title')}>
               <p>
@@ -94,7 +114,6 @@ export default function LicensesPage() {
             </Entry>
           </CategoryCard>
 
-          {/* --- SOUNDEFFEKTE --- */}
           <CategoryCard title={t('licenses.categories.sound')}>
             <Entry title={t('licenses.sound.title')}>
               <p>
@@ -159,20 +178,10 @@ export default function LicensesPage() {
                   <strong>{t('licenses.labels.license')}</strong>{' '}
                   {t('licenses.freesoundSound.license')}
                 </li>
-                <li>{t('licenses.freesoundSound.thanks')}</li>
-                <li>
-                  <Trans
-                    i18nKey="licenses.freesoundSound.licenseNote"
-                    components={{
-                      license: <ExtLink href="https://pixabay.com/service/license-summary/" />,
-                    }}
-                  />
-                </li>
               </ul>
             </Entry>
           </CategoryCard>
 
-          {/* --- PROJEKT --- */}
           <CategoryCard title={t('licenses.categories.project')}>
             <Entry title={t('licenses.inspiration.title')}>
               <p>
@@ -185,10 +194,6 @@ export default function LicensesPage() {
                 <li>
                   <strong>{t('licenses.labels.creator')}</strong>{' '}
                   <ExtLink href="https://neal.fun/">Neal Agarwal (neal.fun)</ExtLink>
-                </li>
-                <li>
-                  <strong>{t('licenses.labels.inspiration')}</strong>{' '}
-                  {t('licenses.inspiration.note')}
                 </li>
                 <li>
                   <strong>{t('licenses.labels.credit')}</strong>{' '}
@@ -219,4 +224,6 @@ export default function LicensesPage() {
       </footer>
     </div>
   )
+  //#endregion
 }
+//#endregion

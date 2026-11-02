@@ -1,10 +1,15 @@
+//#region Imports
+// MARK: - Imports
 import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import './Onlinepage.css'
 import NavBar from '../components/NavBar'
 import LocalizedLink from '../components/LocalizedLink'
+//#endregion
 
+//#region Online page types and configuration
+// MARK: - Online page types and configuration
 const USER_TOKEN_KEY = 'token'
 const SERVER = import.meta.env.DEV ? '' : (import.meta.env.VITE_SERVER as string | undefined)
 
@@ -27,8 +32,13 @@ function initialIdentity(): IdentityState {
   const token = sessionStorage.getItem(USER_TOKEN_KEY) ?? ''
   return { status: token ? 'checking' : 'missing', token }
 }
+//#endregion
 
+//#region Online page
+// MARK: - Online page
 export default function OnlinePage() {
+  //#region Identity and leaderboard state
+  // MARK: Identity and leaderboard state
   const { t } = useTranslation()
   const { lang } = useParams()
   const navigate = useNavigate()
@@ -37,7 +47,10 @@ export default function OnlinePage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>([])
   const [leaderboardError, setLeaderboardError] = useState(false)
   const [leaderboardLoaded, setLeaderboardLoaded] = useState(false)
+  //#endregion
 
+  //#region Data loading
+  // MARK: Data loading
   useEffect(() => {
     const controller = new AbortController()
 
@@ -120,7 +133,10 @@ export default function OnlinePage() {
     void verifyToken()
     return () => controller.abort()
   }, [identity.status, identity.token])
+  //#endregion
 
+  //#region Account action
+  // MARK: Account action
   const submitNickname = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const name = nickname.trim()
@@ -162,7 +178,10 @@ export default function OnlinePage() {
       })
     }
   }
+  //#endregion
 
+  //#region Render
+  // MARK: Render
   return (
     <div className="landing online-page">
       <NavBar />
@@ -311,4 +330,6 @@ export default function OnlinePage() {
       </footer>
     </div>
   )
+  //#endregion
 }
+//#endregion

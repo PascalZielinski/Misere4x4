@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+// #region Imports
+// MARK: - Imports
 use App\Entity\QueueEntry;
 use App\Entity\Room;
 use App\Entity\RoomParticipant;
@@ -16,18 +18,28 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
+// #endregion
+
 final readonly class MatchmakingService
 {
+    // #region Matchmaking configuration
+    // MARK: - Matchmaking configuration
     private const ROOM_TTL_SECONDS = 60;
     private const MAX_ROOM_CODE_ATTEMPTS = 3;
     private const ROOM_CODE_SELECTION_ATTEMPTS = 32;
+    // #endregion
 
+    // #region Dependencies
+    // MARK: - Dependencies
     public function __construct(
         private ManagerRegistry $doctrine,
         private MisereGameLogic $gameLogic,
     ) {
     }
+    // #endregion
 
+    // #region Queue actions
+    // MARK: - Queue actions
     /**
      * @return array<string, mixed>
      */
@@ -170,7 +182,10 @@ final readonly class MatchmakingService
             }
         }
     }
+    // #endregion
 
+    // #region Player matching
+    // MARK: - Player matching
     private function matchWaitingPlayers(): void
     {
         $this->removeExpiredRooms();
@@ -233,7 +248,10 @@ final readonly class MatchmakingService
             }
         }
     }
+    // #endregion
 
+    // #region Room and persistence helpers
+    // MARK: - Room and persistence helpers
     /**
      * @param array<int, true> $reservedCodes
      */
@@ -305,4 +323,5 @@ final readonly class MatchmakingService
     {
         return new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
     }
+    // #endregion
 }

@@ -1,3 +1,5 @@
+//#region Imports
+// MARK: - Imports
 import {
   useEffect,
   useRef,
@@ -14,7 +16,10 @@ import { cellLabel, newGameState, placeAt, SIZE } from '../game/placement'
 import { getResult } from '../game/result'
 import type { Mark, SavedGame } from '../utils/localGameStorage'
 import './Adminpage.css'
+//#endregion
 
+//#region Desktop sky configuration
+// MARK: - Desktop sky configuration
 type RGB = [number, number, number]
 
 function makeStars(count: number): { x: number; y: number; size: number; delay: number }[] {
@@ -78,7 +83,10 @@ function nightAmount(h: number): number {
   if (h > 18 && h < 20) return (h - 18) / 2
   return 1 - (h - 5) / 2
 }
+//#endregion
 
+//#region Terminal game helpers
+// MARK: - Terminal game helpers
 const BOARD_LETTERS = ['a', 'b', 'c', 'd']
 
 function formatBoard(board: (Mark | null)[]): string[] {
@@ -116,9 +124,10 @@ function createFreshGame(first: Side): SavedGame {
     markB: 'O',
   } as SavedGame
 }
+//#endregion
 
-/* ---------- Fake-Terminal: Download / Installation ---------- */
-
+//#region Terminal simulation helpers
+// MARK: - Terminal simulation helpers
 type Step = { line: string; wait: number; replace?: boolean }
 
 const REPO = '3erReihe'
@@ -141,7 +150,7 @@ function writeInstalled() {
   try {
     sessionStorage.setItem(INSTALL_KEY, '1')
   } catch {
-    /* sessionStorage nicht verfügbar */
+
   }
 }
 
@@ -151,7 +160,6 @@ function bar(label: string, p: number): string {
   return `${label} [${'#'.repeat(filled)}${'.'.repeat(n - filled)}] ${Math.round(p * 100)}%`
 }
 
-// Ein Ladebalken, der in einer Zeile hochzählt (replace = letzte Zeile überschreiben)
 function progress(label: string, steps = 10, wait = 110): Step[] {
   const out: Step[] = [{ line: bar(label, 0), wait: 150 }]
   for (let i = 1; i <= steps; i++) {
@@ -170,9 +178,10 @@ function installSteps(): Step[] {
     { line: 'found 0 vulnerabilities', wait: 100 },
   ]
 }
+//#endregion
 
-/* ---------- Fenster ---------- */
-
+//#region Draggable window
+// MARK: - Draggable window
 type WindowKind = 'default' | 'folder' | 'txt' | 'cmd'
 
 function DraggableWindow({
@@ -197,6 +206,8 @@ function DraggableWindow({
   const [dragging, setDragging] = useState(false)
   const dragRef = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null)
 
+  //#region Drag interactions
+  // MARK: Drag interactions
   const startDrag = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (e.button !== 0) return
     if ((e.target as HTMLElement).closest('button')) return
@@ -219,7 +230,10 @@ function DraggableWindow({
       e.currentTarget.releasePointerCapture(e.pointerId)
     }
   }
+  //#endregion
 
+  //#region Render
+  // MARK: Render
   return (
     <section
       className={`desktop-window desktop-window--${kind}${dragging ? ' is-dragging' : ''}`}
@@ -257,8 +271,12 @@ function DraggableWindow({
       {children}
     </section>
   )
+  //#endregion
 }
+//#endregion
 
+//#region Analog clock
+// MARK: - Analog clock
 function AnalogClock({
   hour,
   minute,
@@ -274,6 +292,8 @@ function AnalogClock({
   const hourAngle = (hour % 12) * 30 + minute * 0.5
   const minuteAngle = minute * 6
 
+  //#region Clock interactions
+  // MARK: Clock interactions
   const angleFromEvent = (e: ReactPointerEvent<SVGSVGElement>): number | null => {
     const svg = ref.current
     if (!svg) return null
@@ -337,7 +357,10 @@ function AnalogClock({
 
   const hourTip = point(hourAngle, 46)
   const minuteTip = point(minuteAngle, 72)
+  //#endregion
 
+  //#region Render
+  // MARK: Render
   return (
     <svg
       ref={ref}
@@ -399,8 +422,12 @@ function AnalogClock({
       <circle cx="100" cy="100" r="5" className="analog-clock-center" />
     </svg>
   )
+  //#endregion
 }
+//#endregion
 
+//#region Admin dashboard access
+// MARK: - Admin dashboard access
 export default function AdminDashboard() {
   const { lang } = useParams()
 
@@ -410,8 +437,13 @@ export default function AdminDashboard() {
 
   return <AdminDesktop />
 }
+//#endregion
 
+//#region Admin desktop
+// MARK: - Admin desktop
 function AdminDesktop() {
+  //#region Desktop state
+  // MARK: Desktop state
   const { t } = useTranslation()
   const readmeText = [
     t('admin.readme.heading'),
@@ -462,7 +494,10 @@ function AdminDesktop() {
   const [busy, setBusy] = useState(false)
   const cmdInputRef = useRef<HTMLInputElement>(null)
   const timers = useRef<number[]>([])
+  //#endregion
 
+  //#region Desktop lifecycle
+  // MARK: Desktop lifecycle
   useEffect(() => {
     const id = window.setInterval(() => setNow(new Date()), 1000)
     return () => window.clearInterval(id)
@@ -491,7 +526,10 @@ function AdminDesktop() {
       cmdOutputRef.current.scrollTop = cmdOutputRef.current.scrollHeight
     }
   }, [cmdLines])
+  //#endregion
 
+  //#region Terminal actions
+  // MARK: Terminal actions
   const play = (steps: Step[], onDone?: () => void) => {
     setBusy(true)
     let tt = 0
@@ -700,7 +738,10 @@ function AdminDesktop() {
     setCmdLines(next)
     setCmdInput('')
   }
+  //#endregion
 
+  //#region Clock controls
+  // MARK: Clock controls
   const displayTime = new Date(now.getTime() + timeOffsetSec * 1000)
   const hourDecimal =
     displayTime.getHours() +
@@ -733,7 +774,10 @@ function AdminDesktop() {
     const mm = String(displayTime.getMinutes()).padStart(2, '0')
     return `${h12}:${mm} ${h >= 12 ? 'PM' : 'AM'}`
   })()
+  //#endregion
 
+  //#region Render
+  // MARK: Render
   return (
     <div className="desktop">
       <div className="desktop-screen">
@@ -1078,4 +1122,6 @@ function AdminDesktop() {
       </div>
     </div>
   )
+  //#endregion
 }
+//#endregion

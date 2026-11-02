@@ -1,13 +1,26 @@
+//#region Imports
+// MARK: - Imports
 import { useTranslation } from 'react-i18next'
 import LocalizedLink from '../components/LocalizedLink'
 import './404.css'
+//#endregion
 
+//#region Page constants
+// MARK: - Page constants
 const ROWS = 15 
 const ITEMS = 30
+//#endregion
 
+//#region Not found page
+// MARK: - Not found page
 export default function NotFound() {
+  //#region Translations
+  // MARK: Translations
   const { t } = useTranslation()
+  //#endregion
 
+  //#region Render
+  // MARK: Render
   return (
     <div className="not-found">
       <div className="not-found-bg" aria-hidden="true">
@@ -40,4 +53,6 @@ export default function NotFound() {
       </div>
     </div>
   )
+  //#endregion
 }
+//#endregion

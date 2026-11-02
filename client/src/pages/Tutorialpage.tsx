@@ -1,3 +1,5 @@
+//#region Imports
+// MARK: - Imports
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import './localgamepage.css'
@@ -7,7 +9,10 @@ import retryUrl from '../assets/retry-svgrepo-com.svg'
 import crown from '../assets/crown-svgrepo-com.svg'
 import { cellLabel } from '../game/placement'
 import type { Mark } from '../utils/localGameStorage'
+//#endregion
 
+//#region Tutorial board data
+// MARK: - Tutorial board data
 const ROWS = ['A', 'B', 'C', 'D']
 const COLS = [1, 2, 3, 4]
 
@@ -52,7 +57,10 @@ const STEP_PLACEMENTS: Placement[] = [
 const FIRST_STEP = 0
 const LAST_STEP = STEP_PLACEMENTS.length - 1
 const FINISHED = -1
+//#endregion
 
+//#region Tutorial board helpers
+// MARK: - Tutorial board helpers
 function getBoardForStep(step: number): (Mark | null)[] {
   const board = [...TUTORIAL_BOARD]
   const s = step === FINISHED ? LAST_STEP : step
@@ -60,13 +68,31 @@ function getBoardForStep(step: number): (Mark | null)[] {
   if (s >= 5) board[CELL_A4] = 'X'
   return board
 }
+//#endregion
 
+//#region Tooltip types
+// MARK: - Tooltip types
 interface TooltipStyle extends React.CSSProperties {
   '--arrow-x'?: string
   '--arrow-y'?: string
 }
 
+interface TutorialTooltipProps {
+  targetRef: React.RefObject<HTMLElement>
+  placement: Placement
+  text: string
+  isFirst: boolean
+  isLast: boolean
+  onNext: () => void
+  onBack: () => void
+}
+//#endregion
+
+//#region Tutorial page
+// MARK: - Tutorial page
 export default function TutorialPage() {
+  //#region Tutorial state
+  // MARK: Tutorial state
   const { t } = useTranslation()
   const [step, setStep] = useState<number>(FIRST_STEP)
 
@@ -88,7 +114,10 @@ export default function TutorialPage() {
 
   const active = step >= FIRST_STEP && step <= LAST_STEP
   const showWinning = step >= 5 || step === FINISHED
+  //#endregion
 
+  //#region Tutorial lifecycle
+  // MARK: Tutorial lifecycle
   useEffect(() => {
     if (!active) return
     const prev = document.body.style.overflow
@@ -97,7 +126,10 @@ export default function TutorialPage() {
       document.body.style.overflow = prev
     }
   }, [active])
+  //#endregion
 
+  //#region Tutorial navigation
+  // MARK: Tutorial navigation
   function goNext() {
     setStep((s) => (s >= LAST_STEP ? FINISHED : s + 1))
   }
@@ -107,7 +139,10 @@ export default function TutorialPage() {
   function finish() {
     setStep(FINISHED)
   }
+  //#endregion
 
+  //#region Tutorial display state
+  // MARK: Tutorial display state
   const playerA = t('local.playerA')
   const playerB = t('local.playerB')
   const markA: Mark = 'X'
@@ -133,7 +168,10 @@ export default function TutorialPage() {
   const activeRef = active
     ? (targetRefs[step] as React.RefObject<HTMLElement>)
     : null
+  //#endregion
 
+  //#region Render
+  // MARK: Render
   return (
     <div className="game-page">
       <NavBar />
@@ -316,18 +354,12 @@ export default function TutorialPage() {
       </main>
     </div>
   )
+  //#endregion
 }
+//#endregion
 
-interface TutorialTooltipProps {
-  targetRef: React.RefObject<HTMLElement>
-  placement: Placement
-  text: string
-  isFirst: boolean
-  isLast: boolean
-  onNext: () => void
-  onBack: () => void
-}
-
+//#region Tutorial tooltip
+// MARK: - Tutorial tooltip
 function TutorialTooltip({
   targetRef,
   placement,
@@ -337,6 +369,8 @@ function TutorialTooltip({
   onNext,
   onBack,
 }: TutorialTooltipProps) {
+  //#region Tooltip state
+  // MARK: Tooltip state
   const { t } = useTranslation()
   const tooltipRef = useRef<HTMLDivElement>(null)
   const [style, setStyle] = useState<TooltipStyle>({
@@ -345,7 +379,10 @@ function TutorialTooltip({
     left: 0,
     visibility: 'hidden',
   })
+  //#endregion
 
+  //#region Tooltip positioning
+  // MARK: Tooltip positioning
   useLayoutEffect(() => {
     const target = targetRef.current
     const tooltip = tooltipRef.current
@@ -404,7 +441,10 @@ function TutorialTooltip({
     window.addEventListener('resize', update)
     return () => window.removeEventListener('resize', update)
   }, [targetRef, placement])
+  //#endregion
 
+  //#region Render
+  // MARK: Render
   return (
     <div
       ref={tooltipRef}
@@ -435,4 +475,6 @@ function TutorialTooltip({
       <span className="tutorial-tooltip-arrow" aria-hidden="true" />
     </div>
   )
+  //#endregion
 }
+//#endregion

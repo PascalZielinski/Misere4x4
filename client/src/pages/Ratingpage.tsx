@@ -1,28 +1,40 @@
+//#region Imports
+// MARK: - Imports
 import { Fragment, useRef, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import './Ratingpage.css'
 import NavBar from '../components/NavBar'
 import LocalizedLink from '../components/LocalizedLink'
+//#endregion
 
+//#region Rating configuration
+// MARK: - Rating configuration
 const WEBHOOK = import.meta.env.VITE_WEBHOOK as string | undefined
 const MAX_COMMENT = 255
 const MIN_RATING = 3
 const PULSE_MS = 600
 
 type Status = 'idle' | 'sending' | 'success' | 'error'
+//#endregion
 
+//#region Rating page
+// MARK: - Rating page
 export default function RatingPage() {
+  //#region Form state
+  // MARK: Form state
   const { t } = useTranslation()
   const [rating, setRating] = useState(0)
   const [comment, setComment] = useState('')
   const [status, setStatus] = useState<Status>('idle')
   const [pulse, setPulse] = useState(false)
   const pulseTimer = useRef<number | undefined>(undefined)
+  //#endregion
 
+  //#region Form actions
+  // MARK: Form actions
   const triggerPulse = () => {
     window.clearTimeout(pulseTimer.current)
     setPulse(false)
-    // eine Frame-Pause, damit die Animation bei jedem Klick neu startet
     requestAnimationFrame(() => {
       setPulse(true)
       pulseTimer.current = window.setTimeout(() => setPulse(false), PULSE_MS)
@@ -57,7 +69,10 @@ export default function RatingPage() {
       setStatus('error');
     }
   };
+  //#endregion
 
+  //#region Render
+  // MARK: Render
   return (
     <div className="landing">
       <NavBar />
@@ -146,4 +161,6 @@ export default function RatingPage() {
       </footer>
     </div>
   )
+  //#endregion
 }
+//#endregion

@@ -1,3 +1,5 @@
+//#region Imports
+// MARK: - Imports
 import { useEffect, useState, type FormEvent, type CSSProperties } from 'react'
 import { useTranslation } from 'react-i18next'
 import './localgamepage.css'
@@ -15,7 +17,10 @@ import { getSoundGain } from '../utils/audioSettings'
 import backUrl from '../assets/back_001.ogg'
 import dropXUrl from '../assets/drop_001.ogg'
 import dropOUrl from '../assets/drop_003.ogg'
+//#endregion
 
+//#region Board and audio configuration
+// MARK: - Board and audio configuration
 const ROWS = ['A', 'B', 'C', 'D']
 const COLS = [1, 2, 3, 4]
 
@@ -44,8 +49,13 @@ function formatStart(ts: number | null, locale: string, unknown: string): string
     minute: '2-digit',
   })
 }
+//#endregion
 
+//#region Local game page
+// MARK: - Local game page
 export default function LocalGame() {
+  //#region Game state
+  // MARK: Game state
   const { t, i18n } = useTranslation()
   const [saved, setSaved] = useState<SavedGame | null>(loadGame)
 
@@ -70,7 +80,10 @@ export default function LocalGame() {
 
   const startText = (ts: number | null) =>
     formatStart(ts, i18n.language, t('local.unknown'))
+  //#endregion
 
+  //#region Game effects
+  // MARK: Game effects
   useEffect(() => {
     setIsShaking(false)
     if (!game || over) return
@@ -90,7 +103,10 @@ export default function LocalGame() {
     const timer = setTimeout(() => setShowResult(true), 1000)
     return () => clearTimeout(timer)
   }, [over])
+  //#endregion
 
+  //#region Game actions
+  // MARK: Game actions
   function startNew(e: FormEvent) {
     e.preventDefault()
     if (!ready) return
@@ -190,7 +206,10 @@ export default function LocalGame() {
     setNameB('')
     setGame(null)
   }
+  //#endregion
 
+  //#region Display state
+  // MARK: Display state
   const playerA = game?.playerA ?? t('local.playerA')
   const playerB = game?.playerB ?? t('local.playerB')
 
@@ -209,7 +228,10 @@ export default function LocalGame() {
     turnText = t('local.draw')
     turnMarkShown = null
   }
+  //#endregion
 
+  //#region Render
+  // MARK: Render
   return (
     <div className="game-page">
       <NavBar />
@@ -527,4 +549,6 @@ export default function LocalGame() {
       )}
     </div>
   )
+  //#endregion
 }
+//#endregion

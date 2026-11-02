@@ -1,3 +1,5 @@
+//#region Imports
+// MARK: - Imports
 import { useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router'
 import { useTranslation } from 'react-i18next'
@@ -5,7 +7,10 @@ import './landingpage.css'
 import NavBar from '../components/NavBar'
 import LocalizedLink from '../components/LocalizedLink'
 import PumpkinCarver from '../components/PumpkinCarver'
+//#endregion
 
+//#region Server health check
+// MARK: - Server health check
 const SERVER = import.meta.env.VITE_SERVER as string | undefined
 // Debug: Server-Check überspringen, wenn VITE_DEBUG=true gesetzt ist
 const DEBUG = import.meta.env.VITE_DEBUG === 'true'
@@ -27,8 +32,13 @@ async function pingServer(): Promise<boolean> {
     clearTimeout(timer)
   }
 }
+//#endregion
 
+//#region Landing page
+// MARK: - Landing page
 export default function LandingPage() {
+  //#region Route and UI state
+  // MARK: Route and UI state
   const { t } = useTranslation()
   const { lang } = useParams()
   const navigate = useNavigate()
@@ -37,7 +47,10 @@ export default function LandingPage() {
   const [serverDown, setServerDown] = useState(false)
 
   const isDebug = DEBUG || searchParams.get('debug') === '1'
+  //#endregion
 
+  //#region Online navigation
+  // MARK: Online navigation
   const goOnline = async () => {
     if (isDebug) {
 
@@ -52,7 +65,10 @@ export default function LandingPage() {
     if (ok) navigate(`/${lang}/online`)
     else setServerDown(true)
   }
+  //#endregion
 
+  //#region Render
+  // MARK: Render
   return (
     <div className="landing">
       <NavBar />
@@ -102,4 +118,6 @@ export default function LandingPage() {
       </footer>
     </div>
   )
+  //#endregion
 }
+//#endregion

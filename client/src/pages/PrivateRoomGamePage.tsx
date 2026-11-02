@@ -1,3 +1,5 @@
+//#region Imports
+// MARK: - Imports
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { useTranslation } from 'react-i18next'
@@ -15,7 +17,10 @@ import { pillAngles } from '../game/result'
 import { useFirstTurnSpin } from '../game/firstTurn'
 import './localgamepage.css'
 import './PrivateRoomGamePage.css'
+//#endregion
 
+//#region Board and audio configuration
+// MARK: - Board and audio configuration
 const ROWS = ['A', 'B', 'C', 'D']
 const COLS = [1, 2, 3, 4]
 
@@ -31,7 +36,10 @@ function play(sound: HTMLAudioElement) {
   sound.currentTime = 0
   sound.play().catch(() => {})
 }
+//#endregion
 
+//#region Local score storage
+// MARK: - Local score storage
 type LocalScore = { a: number; b: number; draws: number; lastRound: number }
 const emptyScore: LocalScore = { a: 0, b: 0, draws: 0, lastRound: 0 }
 
@@ -59,8 +67,13 @@ function readScore(code: string): LocalScore {
     return emptyScore
   }
 }
+//#endregion
 
+//#region Private room game page
+// MARK: - Private room game page
 export default function PrivateRoomGamePage() {
+  //#region Game state
+  // MARK: Game state
   const { t } = useTranslation()
   const { lang, code = '' } = useParams()
   const navigate = useNavigate()
@@ -86,7 +99,10 @@ export default function PrivateRoomGamePage() {
   const roomScoreKey = scoreKey(code)
   const storedScore = useMemo(() => readScore(code), [code])
   const score = scoreOverride?.key === roomScoreKey ? scoreOverride.value : storedScore
+  //#endregion
 
+  //#region Room state synchronization
+  // MARK: Room state synchronization
   const applyRoomState = useCallback((state: PrivateRoomState) => {
     const previousGame = observedGame.current
     const isNewerGame =
@@ -168,7 +184,10 @@ export default function PrivateRoomGamePage() {
       }
     }
   }, [applyRoomState, code])
+  //#endregion
 
+  //#region Room lifecycle
+  // MARK: Room lifecycle
   useEffect(() => {
     const timer = window.setTimeout(() => void loadRoom(), 0)
     return () => {
@@ -260,7 +279,6 @@ export default function PrivateRoomGamePage() {
     void loadRoom()
   }, [expiresAt, remainingSeconds, loadRoom])
 
-  // Ergebnis-Overlay mit 1s Verzögerung (wie im lokalen Spiel)
   const status = room?.game.status
   const round = room?.game.round ?? null
   const over = status === 'lost' || status === 'draw'
@@ -270,7 +288,10 @@ export default function PrivateRoomGamePage() {
     return () => window.clearTimeout(timer)
   }, [over, round])
   const showResult = over && resultShownRound === round
+  //#endregion
 
+  //#region Game actions
+  // MARK: Game actions
   const doMove = async (index: number) => {
     if (!room || busy || spinningRound !== null) return
     setBusy(true)
@@ -299,7 +320,10 @@ export default function PrivateRoomGamePage() {
       setBusy(false)
     }
   }
+  //#endregion
 
+  //#region Display state
+  // MARK: Display state
   const playerName = (side: RoomSide | null) =>
     room?.participants.find((participant) => participant.side === side)?.name ?? ''
 
@@ -355,7 +379,10 @@ export default function PrivateRoomGamePage() {
   const crownImg = (
     <img src={crown} alt="" aria-hidden="true" className="panel-crown" />
   )
+  //#endregion
 
+  //#region Render
+  // MARK: Render
   return (
     <div className="game-page">
       <NavBar />
@@ -597,7 +624,6 @@ export default function PrivateRoomGamePage() {
         </div>
       )}
 
-      {/* Laden / Warten / Fehler / Startspieler-Auslosung */}
       {(blockingError || !room || waiting || spinningRound !== null) && (
         <div className="overlay">
           <div className="overlay-card" role={blockingError ? 'alert' : 'status'} aria-modal="true">
@@ -639,4 +665,6 @@ export default function PrivateRoomGamePage() {
       )}
     </div>
   )
+  //#endregion
 }
+//#endregion

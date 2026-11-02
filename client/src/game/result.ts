@@ -18,10 +18,8 @@ export type GameResult =
   | { status: 'draw' }
   | { status: 'lost'; loser: Side; chains: Chain[] }
 
-// Alle 24 Dreierfenster. Jede 4er-Gruppe ist eine Brettzeile,
-// 1 = Feld gehört zum Fenster. Feld oben links = höchstes Bit.
-// Nur gültig für SIZE = 4.
 const WINDOWS: readonly number[] = [
+
   // waagerecht (8)
   0b1110_0000_0000_0000,
   0b0111_0000_0000_0000,
@@ -57,10 +55,8 @@ const WINDOWS: readonly number[] = [
 
 const inBoard = (r: number, c: number) => r >= 0 && r < SIZE && c >= 0 && c < SIZE
 
-// Brettindex (zeile * SIZE + spalte) -> Bitmaske. Index 0 = höchstes Bit.
 const bitOf = (index: number) => 1 << (SIZE * SIZE - 1 - index)
 
-// Pro Zeichen eine Bitmaske der belegten Felder.
 function toMasks(board: (Mark | null)[]): Map<Mark, number> {
   const masks = new Map<Mark, number>()
   board.forEach((mark, i) => {
@@ -73,13 +69,11 @@ function hasThree(stones: number): boolean {
   return WINDOWS.some((w) => (stones & w) === w)
 }
 
-// Ein Fenster ist tot, wenn beide Spieler darin Steine haben.
 function canStillMakeThree(masks: Map<Mark, number>): boolean {
   const all = [...masks.values()]
   return WINDOWS.some((w) => all.filter((m) => (m & w) !== 0).length <= 1)
 }
 
-// Nur für die Darstellung: komplette Kette (auch länger als 3) durch das letzte Feld.
 function chainsThrough(board: (Mark | null)[], index: number): Chain[] {
   const mark = board[index]
   if (!mark) return []

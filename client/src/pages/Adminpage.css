@@ -854,12 +854,16 @@ repeating-linear-gradient(
 }
 
 .desktop-window-body--cmd {
+  align-items: stretch;
   padding: 0;
   gap: 0;
   background: #000;
 }
 
 .desktop-cmd-output {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   padding: 0.6rem 0.75rem 0;
   min-height: 10rem;
   max-height: 14rem;
@@ -877,6 +881,9 @@ repeating-linear-gradient(
 
 .desktop-cmd-form {
   display: flex;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   gap: 0.4rem;
   padding: 0.4rem 0.75rem 0.7rem;
   font-family: 'Consolas', 'Courier New', monospace;
