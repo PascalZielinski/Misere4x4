@@ -3,11 +3,15 @@
 namespace App\Entity;
 
 use App\Repository\RoomRepository;
+use App\Service\MisereGameLogic;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 
+/**
+ * @phpstan-import-type GameState from MisereGameLogic
+ */
 #[ORM\Table(
     indexes: [
         new ORM\Index(name: 'IDX_ROOM_EXPIRES_AT', columns: ['expires_at']),
@@ -42,11 +46,17 @@ class Room
     #[ORM\Column]
     private ?\DateTimeImmutable $expiresAt = null;
 
-    /**
-     * @var array<string, mixed>
-     */
+    /** @var GameState */
     #[ORM\Column(type: 'json')]
-    private array $gameState = [];
+    private array $gameState = [
+        'round' => 1,
+        'status' => 'waiting',
+        'firstPlayer' => null,
+        'turn' => null,
+        'board' => [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+        'moves' => [],
+        'result' => ['status' => 'waiting'],
+    ];
 
     /**
      * @var Collection<int, RoomParticipant>
@@ -130,17 +140,13 @@ class Room
         return $this;
     }
 
-    /**
-     * @return array<string, mixed>
-     */
+    /** @return GameState */
     public function getGameState(): array
     {
         return $this->gameState;
     }
 
-    /**
-     * @param array<string, mixed> $gameState
-     */
+    /** @param GameState $gameState */
     public function setGameState(array $gameState): static
     {
         $this->gameState = $gameState;
@@ -165,5 +171,4 @@ class Room
 
         return $this;
     }
-
 }

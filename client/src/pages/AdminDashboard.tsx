@@ -171,15 +171,6 @@ function installSteps(): Step[] {
   ]
 }
 
-const README_TEXT = [
-  '3erReihe – Projekt starten',
-  '',
-  '1. CMD öffnen',
-  '2. git clone https://github.com/PascalZielinski/Misere4x4.git 3erReihe',
-  '3. cd 3erReihe',
-  '4. 3erReihe -start',
-].join('\n')
-
 /* ---------- Fenster ---------- */
 
 type WindowKind = 'default' | 'folder' | 'txt' | 'cmd'
@@ -201,6 +192,7 @@ function DraggableWindow({
   zIndex: number
   onActivate: () => void
 }) {
+  const { t } = useTranslation()
   const [offset, setOffset] = useState(initial)
   const [dragging, setDragging] = useState(false)
   const dragRef = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null)
@@ -256,7 +248,7 @@ function DraggableWindow({
             type="button"
             className="desktop-window-btn desktop-window-btn--close"
             onClick={onClose}
-            aria-label="Schließen"
+            aria-label={t('admin.close')}
           >
             ✕
           </button>
@@ -421,6 +413,14 @@ export default function AdminDashboard() {
 
 function AdminDesktop() {
   const { t } = useTranslation()
+  const readmeText = [
+    t('admin.readme.heading'),
+    '',
+    t('admin.readme.openCmd'),
+    t('admin.readme.clone'),
+    t('admin.readme.changeDirectory'),
+    t('admin.readme.start'),
+  ].join('\n')
   const [name] = useState(
     () => sessionStorage.getItem('adminUser') || 'Administrator',
   )
@@ -447,10 +447,10 @@ function AdminDesktop() {
 
   const [cmdLines, setCmdLines] = useState<string[]>([
     'LouvreOS [Version 1.0.0]',
-    '(c) Louvre Systems. Alle Rechte vorbehalten.',
+    t('admin.terminal.copyright'),
     '',
-    'Anleitung: siehe README.txt',
-    'Tippe "help" für alle Befehle.',
+    t('admin.terminal.readmeHint'),
+    t('admin.terminal.helpHint'),
     '',
   ])
   const [cmdInput, setCmdInput] = useState('')
@@ -845,7 +845,7 @@ function AdminDesktop() {
 
           {readmeOpen && (
             <DraggableWindow
-              title="README.txt - Editor"
+              title={t('admin.readme.editorTitle')}
               kind="txt"
               initial={{ x: 220, y: 20 }}
               zIndex={windowZ.readme}
@@ -853,7 +853,7 @@ function AdminDesktop() {
               onClose={() => setReadmeOpen(false)}
             >
               <div className="desktop-window-body desktop-window-body--notepad">
-                <pre className="desktop-notepad">{README_TEXT}</pre>
+                <pre className="desktop-notepad">{readmeText}</pre>
               </div>
             </DraggableWindow>
           )}
@@ -900,7 +900,7 @@ function AdminDesktop() {
               onClick={() => setStartOpen(false)}
               aria-hidden="true"
             />
-            <div className="desktop-startmenu" role="menu" aria-label="Start">
+            <div className="desktop-startmenu" role="menu" aria-label={t('admin.start')}>
               <div className="desktop-startmenu-user">
                 <span className="desktop-avatar" aria-hidden="true">
                   {name.charAt(0).toUpperCase()}
@@ -908,7 +908,7 @@ function AdminDesktop() {
                 <div className="desktop-startmenu-usertext">
                   <p className="desktop-startmenu-name">{name}</p>
                   <p className="desktop-startmenu-role">
-                    {t('admin.role', { defaultValue: 'Administrator' })}
+                    {t('admin.role')}
                   </p>
                 </div>
               </div>
@@ -972,9 +972,9 @@ function AdminDesktop() {
             <div
               className="desktop-clock-panel"
               role="dialog"
-              aria-label="Uhrzeit anpassen"
+              aria-label={t('admin.adjustTime')}
             >
-              <p className="desktop-clock-title">Uhrzeit anpassen</p>
+              <p className="desktop-clock-title">{t('admin.adjustTime')}</p>
 
               <AnalogClock
                 hour={displayTime.getHours()}
@@ -986,7 +986,7 @@ function AdminDesktop() {
                 type="button"
                 className="desktop-clock-readout"
                 onClick={togglePeriod}
-                title="AM/PM umschalten"
+                title={t('admin.toggleAmPm')}
               >
                 {time12}
               </button>
@@ -996,7 +996,7 @@ function AdminDesktop() {
                 className="desktop-clock-btn desktop-clock-btn--ghost"
                 onClick={resetClock}
               >
-                Live
+                {t('admin.live')}
               </button>
             </div>
           </>
@@ -1016,7 +1016,7 @@ function AdminDesktop() {
               <span />
               <span />
             </span>
-            Start
+            {t('admin.start')}
           </button>
 
           {folderOpen && (
@@ -1070,7 +1070,7 @@ function AdminDesktop() {
             onClick={() => setClockOpen((o) => !o)}
             aria-haspopup="dialog"
             aria-expanded={clockOpen}
-            title="Uhrzeit anpassen"
+            title={t('admin.adjustTime')}
           >
             {time}
           </button>

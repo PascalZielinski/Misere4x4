@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\QueueEntry;
-use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\LockMode;
 use Doctrine\Persistence\ManagerRegistry;
@@ -23,12 +22,27 @@ class QueueEntryRepository extends ServiceEntityRepository
     /**
      * @return QueueEntry[]
      */
-    public function findWaitingForUpdate(): array
+    public function findWaiting(): array
     {
         return $this->createQueryBuilder('entry')
             ->andWhere('entry.room IS NULL')
             ->orderBy('entry.createdAt', 'ASC')
             ->addOrderBy('entry.id', 'ASC')
+            ->setMaxResults(100)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return QueueEntry[]
+     */
+    public function lockWaitingForUpdate(): array
+    {
+        return $this->createQueryBuilder('entry')
+            ->andWhere('entry.room IS NULL')
+            ->orderBy('entry.createdAt', 'ASC')
+            ->addOrderBy('entry.id', 'ASC')
+            ->setMaxResults(100)
             ->getQuery()
             ->setLockMode(LockMode::PESSIMISTIC_WRITE)
             ->getResult();

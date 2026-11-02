@@ -51,7 +51,7 @@ final class Version20261101173018 extends AbstractMigration
         if (!$participants->getColumn('name_id')->getNotnull()) {
             $changes[] = 'CHANGE name_id name_id INT NOT NULL';
         }
-        if ($changes !== []) {
+        if ([] !== $changes) {
             $this->addSql('ALTER TABLE room_participant '.implode(', ', $changes));
         }
 
@@ -92,7 +92,7 @@ final class Version20261101173018 extends AbstractMigration
         if ($participants->getColumn('name_id')->getNotnull()) {
             $changes[] = 'CHANGE name_id name_id INT DEFAULT NULL';
         }
-        if ($changes !== []) {
+        if ([] !== $changes) {
             $this->addSql('ALTER TABLE room_participant '.implode(', ', $changes));
         }
         if (!$participants->hasIndex('UNIQ_C3AAC52E71179CD6')) {

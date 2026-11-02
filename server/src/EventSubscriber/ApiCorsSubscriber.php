@@ -12,7 +12,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 final class ApiCorsSubscriber implements EventSubscriberInterface
 {
-
+    /**
+     * @var list<string>
+     */
     private array $allowedOrigins;
 
     public function __construct(string $allowedOrigins)
@@ -31,19 +33,19 @@ final class ApiCorsSubscriber implements EventSubscriberInterface
     public function handlePreflight(RequestEvent $event): void
     {
         $request = $event->getRequest();
-        if (!$event->isMainRequest() || $request->getMethod() !== 'OPTIONS' || !$this->isApiRequest($request->getPathInfo())) {
+        if (!$event->isMainRequest() || 'OPTIONS' !== $request->getMethod() || !$this->isApiRequest($request->getPathInfo())) {
             return;
         }
 
         $origin = $request->headers->get('Origin');
-        if ($origin !== null && !in_array($origin, $this->allowedOrigins, true)) {
+        if (null !== $origin && !in_array($origin, $this->allowedOrigins, true)) {
             $event->setResponse(new Response('', Response::HTTP_FORBIDDEN));
 
             return;
         }
 
         $response = new Response('', Response::HTTP_NO_CONTENT);
-        if ($origin !== null) {
+        if (null !== $origin) {
             $this->addHeaders($response, $origin);
         }
         $event->setResponse($response);
@@ -56,8 +58,10 @@ final class ApiCorsSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $event->getResponse()->headers->set('Cache-Control', 'no-store');
+
         $origin = $request->headers->get('Origin');
-        if ($origin !== null && in_array($origin, $this->allowedOrigins, true)) {
+        if (null !== $origin && in_array($origin, $this->allowedOrigins, true)) {
             $this->addHeaders($event->getResponse(), $origin);
         }
     }
@@ -65,16 +69,14 @@ final class ApiCorsSubscriber implements EventSubscriberInterface
     private function addHeaders(Response $response, string $origin): void
     {
         $response->headers->set('Access-Control-Allow-Origin', $origin);
-        $response->headers->set('Access-Control-Allow-Credentials', 'true');
-        $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
         $response->headers->set('Access-Control-Allow-Headers', 'Authorization, Content-Type');
-        $response->headers->set('Access-Control-Expose-Headers', 'X-User-Token');
         $response->headers->set('Access-Control-Max-Age', '600');
         $response->setVary('Origin', false);
     }
 
     private function isApiRequest(string $path): bool
     {
-        return str_starts_with($path, '/api/');
+        return '/api' === $path || str_starts_with($path, '/api/');
     }
 }

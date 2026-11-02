@@ -85,16 +85,12 @@ function token(): string {
 async function request(path: string, init?: RequestInit): Promise<PrivateRoomState> {
   const response = await fetch(`${API_BASE}/api/private-rooms${path}`, {
     ...init,
-    credentials: 'include',
     headers: {
       Authorization: `Bearer ${token()}`,
       ...(init?.body ? { 'Content-Type': 'application/json' } : {}),
       ...init?.headers,
     },
   })
-  const rotatedToken = response.headers.get('X-User-Token')
-  if (rotatedToken) sessionStorage.setItem(USER_TOKEN_KEY, rotatedToken)
-
   const payload: unknown = await response.json().catch(() => null)
   if (!response.ok) {
     let message = `Room request failed with status ${response.status}.`

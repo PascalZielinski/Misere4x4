@@ -2,6 +2,21 @@
 framework:
     secret: '%env(APP_SECRET)%'
 
+    rate_limiter:
+        limiters:
+            user_creation_ip:
+                policy: fixed_window
+                limit: 10
+                interval: '1 hour'
+            private_room_join_ip:
+                policy: fixed_window
+                limit: 5
+                interval: '1 minute'
+            private_room_join_hourly_ip:
+                policy: fixed_window
+                limit: 30
+                interval: '1 hour'
+
     # Note that the session will be started ONLY if you read or write from it.
     session: true
 

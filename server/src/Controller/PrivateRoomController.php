@@ -7,13 +7,19 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Service\PrivateRoomService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\Exception\JsonException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
+use Symfony\Component\HttpKernel\Exception\GoneHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Jwt\Grant;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
@@ -41,22 +47,52 @@ final class PrivateRoomController extends AbstractController
         Request $request,
         #[CurrentUser] User $user,
         PrivateRoomService $privateRooms,
+        #[Autowire(service: 'limiter.private_room_join_ip')]
+        RateLimiterFactory $perMinuteLimiter,
+        #[Autowire(service: 'limiter.private_room_join_hourly_ip')]
+        RateLimiterFactory $hourlyLimiter,
     ): JsonResponse {
-        return $this->respond(function () use ($request, $user, $privateRooms): JsonResponse {
-            $payload = $this->payload($request);
-            $code = $payload['code'] ?? null;
-            if (!is_string($code) || !preg_match('/^\d{4}$/D', $code)) {
-                throw new BadRequestHttpException('Room code must contain exactly four digits.');
+        return $this->respond(function () use (
+            $request,
+            $user,
+            $privateRooms,
+            $perMinuteLimiter,
+            $hourlyLimiter,
+        ): JsonResponse {
+            $key = $request->getClientIp() ?? 'unknown';
+            $minuteLimit = $perMinuteLimiter->create($key)->consume();
+            $hourLimit = $hourlyLimiter->create($key)->consume();
+            if (!$minuteLimit->isAccepted() || !$hourLimit->isAccepted()) {
+                $retryAfter = !$minuteLimit->isAccepted()
+                    ? $minuteLimit->getRetryAfter()
+                    : $hourLimit->getRetryAfter();
+                $retrySeconds = max(1, $retryAfter->getTimestamp() - time());
+
+                return $this->json(
+                    ['error' => 'Too many room join attempts. Please try again later.'],
+                    Response::HTTP_TOO_MANY_REQUESTS,
+                    ['Retry-After' => (string) $retrySeconds],
+                );
             }
 
-            return $this->roomResponse($privateRooms->join((int) $code, $user));
+            $payload = $this->payload($request);
+            $code = $payload['code'] ?? null;
+            if (!is_string($code) || !preg_match('/^(?:\d{4}|\d{6})$/D', $code)) {
+                throw new BadRequestHttpException('Room code must contain four or six digits.');
+            }
+
+            try {
+                return $this->roomResponse($privateRooms->join((int) $code, $user));
+            } catch (NotFoundHttpException|ConflictHttpException|GoneHttpException) {
+                throw new NotFoundHttpException('Room not found or unavailable.');
+            }
         });
     }
 
     #[Route(
         '/{identifier}',
         name: 'api_private_rooms_get',
-        requirements: ['identifier' => '\d{4}|[0-9a-fA-F-]{36}'],
+        requirements: ['identifier' => '(?:\d{4}|\d{6}|[0-9a-fA-F-]{36})'],
         methods: ['GET'],
     )]
     public function get(
@@ -73,7 +109,7 @@ final class PrivateRoomController extends AbstractController
     #[Route(
         '/{identifier}/moves',
         name: 'api_private_rooms_move',
-        requirements: ['identifier' => '\d{4}|[0-9a-fA-F-]{36}'],
+        requirements: ['identifier' => '(?:\d{4}|\d{6}|[0-9a-fA-F-]{36})'],
         methods: ['POST'],
     )]
     public function move(
@@ -95,7 +131,7 @@ final class PrivateRoomController extends AbstractController
     #[Route(
         '/{identifier}/restart',
         name: 'api_private_rooms_restart',
-        requirements: ['identifier' => '\d{4}|[0-9a-fA-F-]{36}'],
+        requirements: ['identifier' => '(?:\d{4}|\d{6}|[0-9a-fA-F-]{36})'],
         methods: ['POST'],
     )]
     public function restart(
@@ -109,10 +145,13 @@ final class PrivateRoomController extends AbstractController
         ));
     }
 
+    /**
+     * @param array<string, mixed> $state
+     */
     private function roomResponse(array $state, int $status = Response::HTTP_OK): JsonResponse
     {
         $factory = $this->hub->getFactory();
-        if ($factory === null) {
+        if (null === $factory) {
             throw new \LogicException('The Mercure hub must have a JWT token factory configured.');
         }
 
@@ -136,11 +175,14 @@ final class PrivateRoomController extends AbstractController
         }
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function payload(Request $request): array
     {
         try {
             return $request->toArray();
-        } catch (\JsonException $exception) {
+        } catch (JsonException $exception) {
             throw new BadRequestHttpException('Request body must be valid JSON.', $exception);
         }
     }

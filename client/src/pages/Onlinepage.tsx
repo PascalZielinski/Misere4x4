@@ -88,7 +88,6 @@ export default function OnlinePage() {
 
     const controller = new AbortController()
     const verifyToken = async () => {
-      let currentToken = identity.token
       try {
         if (!import.meta.env.DEV && !SERVER) {
           throw new Error('VITE_SERVER is not configured.')
@@ -99,12 +98,9 @@ export default function OnlinePage() {
           signal: controller.signal,
         })
 
-        currentToken = response.headers.get('X-User-Token') || currentToken
-        sessionStorage.setItem(USER_TOKEN_KEY, currentToken)
-
         if (response.status === 401) {
           sessionStorage.removeItem(USER_TOKEN_KEY)
-          setIdentity({ status: 'missing', token: currentToken, error: 'invalidToken' })
+          setIdentity({ status: 'missing', token: '', error: 'invalidToken' })
           return
         }
         if (!response.ok) throw new Error(`User lookup failed with status ${response.status}.`)
@@ -114,11 +110,10 @@ export default function OnlinePage() {
           throw new Error('User lookup returned an invalid response.')
         }
 
-        setIdentity({ status: 'authenticated', token: currentToken, name: user.name })
+        setIdentity({ status: 'authenticated', token: identity.token, name: user.name })
       } catch {
         if (controller.signal.aborted) return
-        currentToken = sessionStorage.getItem(USER_TOKEN_KEY) ?? currentToken
-        setIdentity({ status: 'error', token: currentToken, error: 'serverError' })
+        setIdentity({ status: 'error', token: identity.token, error: 'serverError' })
       }
     }
 
@@ -227,9 +222,9 @@ export default function OnlinePage() {
                 </colgroup>
                 <thead>
                   <tr>
-                    <th scope="col">{t('online.colName', 'Name')}</th>
-                    <th scope="col" className="lb-th-score">{t('online.colScore', 'Score')}</th>
-                    <th scope="col" className="lb-th-active">{t('online.colActive', 'Active')}</th>
+                    <th scope="col">{t('online.colName')}</th>
+                    <th scope="col" className="lb-th-score">{t('online.colScore')}</th>
+                    <th scope="col" className="lb-th-active">{t('online.colActive')}</th>
                   </tr>
                 </thead>
                 <tbody>

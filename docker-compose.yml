@@ -51,6 +51,16 @@ services:
       - db
       - mercure
 
+  worker:
+    build: ./server
+    working_dir: /var/www/html
+    command: php bin/console app:maintenance:work --interval=60 --no-interaction
+    restart: unless-stopped
+    volumes:
+      - ./server:/var/www/html
+    depends_on:
+      - db
+
   mercure:
     image: dunglas/mercure
     restart: unless-stopped

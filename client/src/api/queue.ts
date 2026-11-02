@@ -23,12 +23,8 @@ async function request(method: 'GET' | 'POST' | 'DELETE'): Promise<QueueState> {
 
   const response = await fetch(`${API_BASE}/api/queue`, {
     method,
-    credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   })
-  const rotatedToken = response.headers.get('X-User-Token')
-  if (rotatedToken) sessionStorage.setItem(USER_TOKEN_KEY, rotatedToken)
-
   const payload: unknown = await response.json().catch(() => null)
   if (!response.ok) {
     const message =

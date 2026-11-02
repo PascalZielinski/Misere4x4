@@ -325,10 +325,10 @@ export default function PumpkinCarver() {
 
       <div className="pumpkin-actions" style={{ display: 'flex', gap: '1rem' }}>
         <button type="button" className="pumpkin-btn" onClick={retry}>
-          {t('pumpkin.retry', 'Retry')}
+          {t('pumpkin.retry')}
         </button>
         <button type="button" className="pumpkin-btn pumpkin-btn--primary" onClick={close}>
-          {t('pumpkin.done', 'Done')}
+          {t('pumpkin.done')}
         </button>
       </div>
 
@@ -366,7 +366,7 @@ export default function PumpkinCarver() {
         type="button"
         className="pumpkin-mini"
         onClick={() => setOpen(true)}
-        aria-label={t('pumpkin.open', 'Kürbis schnitzen')}
+        aria-label={t('pumpkin.open')}
       >
         <img src={pumpkinGlow} alt="" draggable={false} />
         <img className="pumpkin-mini__skin" src={saved ?? pumpkinSkin} alt="" draggable={false} />

@@ -92,7 +92,7 @@ function AdminLogin() {
               type="text"
               value={user}
               onChange={(e) => setUser(e.target.value)}
-              placeholder="Administrator"
+              placeholder={t('admin.role')}
               spellCheck={false}
               autoCapitalize="off"
               autoFocus

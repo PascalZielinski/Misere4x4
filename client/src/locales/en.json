@@ -18,6 +18,22 @@
         "musicVolume": "Music volume",
         "toggleTheme": "Toggle dark mode"
     },
+    "common": {
+        "back": "Back",
+        "language": "Language"
+    },
+    "unauthorized": {
+        "title": "Access denied",
+        "home": "Back to home"
+    },
+    "pumpkin": {
+        "retry": "Retry",
+        "done": "Done",
+        "open": "Carve the pumpkin"
+    },
+    "cookiePolicy": {
+        "themePreference": "It only safes the theme prefrence"
+    },
     "cookieConsent": {
         "title": "Cookie settings",
         "message": "misere4x4 uses cookies to provide you with an excellent user experience. By clicking “Accept”, you agree to the <policyLink>Cookie Policy</policyLink>.",
@@ -78,6 +94,13 @@
             "graphics": "Graphics & Icons",
             "sound": "Sound Effects",
             "project": "Project"
+        },
+        "freesoundSound": {
+            "title": "Sound Effect (freesound_community)",
+            "intro": "Sound Effect by <author>freesound_community</author> from <pixabay>Pixabay</pixabay>.",
+            "license": "Pixabay Content License",
+            "thanks": "Say “thanks” to freesound_community! This helps keep the creative spirit going!",
+            "licenseNote": "By downloading, you agree to our <license>License</license>."
         }
     },
     "local": {
@@ -142,7 +165,25 @@
         "welcome": "Welcome, {{user}}.",
         "back": "Back",
         "3": "Three in a row",
-        "start": "Click on the start button",
+        "role": "Administrator",
+        "close": "Close",
+        "readme": {
+            "heading": "3erReihe – Start the project",
+            "openCmd": "1. Open CMD",
+            "clone": "2. git clone https://github.com/PascalZielinski/Misere4x4.git 3erReihe",
+            "changeDirectory": "3. cd 3erReihe",
+            "start": "4. 3erReihe -start",
+            "editorTitle": "README.txt - Editor"
+        },
+        "adjustTime": "Adjust time",
+        "toggleAmPm": "Toggle AM/PM",
+        "start": "Start",
+        "live": "Live",
+        "terminal": {
+            "copyright": "(c) Louvre Systems. All rights reserved.",
+            "readmeHint": "Instructions: see README.txt",
+            "helpHint": "Type \"help\" for all commands."
+        },
         "cmd": "Open a cmd window",
         "gamestart": "Typ 3erReihe -start",
         "follow": "Follow the steps"
@@ -153,6 +194,9 @@
         "requeue": "Search again",
         "backToOnline": "Back",
         "leaderboardTitle": "Leaderboard",
+        "colName": "Name",
+        "colScore": "Score",
+        "colActive": "Active",
         "leaderboardEmpty": "No players yet.",
         "leaderboardError": "Leaderboard could not be loaded.",
         "activeUser": "Active",
@@ -175,17 +219,17 @@
         "title": "Private Room",
         "subtitle": "Play with a friend: create a room or join one with a code.",
         "createTitle": "Create a new room",
-        "createText": "You'll get a 4-digit code to send to your opponent.",
+        "createText": "You'll get a 6-digit code to send to your opponent.",
         "create": "Create room",
         "creating": "Creating …",
         "or": "or",
         "joinTitle": "Join a room",
         "codeLabel": "Room code",
-        "hint": "Enter your friend's 4-digit code.",
+        "hint": "Enter your friend's 6-digit code. Older 4-digit codes still work.",
         "join": "Join",
         "joining": "Joining …",
-        "invalid": "Please enter a valid 4-digit code.",
-        "notFound": "No room found with this code.",
+        "invalid": "Please enter a valid 4- or 6-digit code.",
+        "notFound": "Room not found or unavailable.",
         "unauthorized": "Sign in from the online section first.",
         "goOnline": "Go to online section",
         "generic": "Something went wrong. Please try again.",
@@ -236,12 +280,5 @@
         "sending": "Sending…",
         "success": "Thank you for your feedback!",
         "error": "Could not submit your feedback. Please try again."
-    },
-    "freesoundSound": {
-        "title": "Sound Effect (freesound_community)",
-        "intro": "Sound Effect by <author>freesound_community</author> from <pixabay>Pixabay</pixabay>.",
-        "license": "Pixabay Content License",
-        "thanks": "Say “thanks” to freesound_community! This helps keep the creative spirit going!",
-        "licenseNote": "By downloading, you agree to our <license>License</license>."
-        }
+    }
 }

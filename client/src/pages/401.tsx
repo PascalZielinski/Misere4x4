@@ -36,10 +36,10 @@ export default function Unauthorized() {
       <div className="unauthorized-content">
         <p className="unauthorized-code" aria-hidden="true">401</p>
         <h1 className="unauthorized-title">
-          {t('unauthorized.title', { defaultValue: 'Zugriff verweigert' })}
+          {t('unauthorized.title')}
         </h1>
         <LocalizedLink to="/" className="unauthorized-btn">
-          {t('unauthorized.home', { defaultValue: 'Zur Startseite' })}
+          {t('unauthorized.home')}
         </LocalizedLink>
       </div>
     </div>

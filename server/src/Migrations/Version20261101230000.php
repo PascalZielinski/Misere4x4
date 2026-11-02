@@ -18,7 +18,7 @@ final class Version20261101230000 extends AbstractMigration
     {
         $room = $schema->getTable('room');
         $this->addSql('ALTER TABLE room ADD room_uuid VARCHAR(36) DEFAULT NULL, ADD matchmade TINYINT(1) DEFAULT 0 NOT NULL');
-        $this->addSql("UPDATE room SET room_uuid = UUID() WHERE room_uuid IS NULL");
+        $this->addSql('UPDATE room SET room_uuid = UUID() WHERE room_uuid IS NULL');
         $this->addSql('ALTER TABLE room MODIFY room_uuid VARCHAR(36) NOT NULL');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_ROOM_UUID ON room (room_uuid)');
         if (!$room->hasIndex('UNIQ_ROOM_CODE')) {

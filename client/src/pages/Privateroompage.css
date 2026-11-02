@@ -200,6 +200,18 @@
   animation: private-room-shake 0.3s;
 }
 
+@media (max-width: 420px) {
+  .private-room__code {
+    gap: 0.35rem;
+  }
+
+  .private-room__digit {
+    width: clamp(1.8rem, 9vw, 2.25rem);
+    height: 3.5rem;
+    font-size: clamp(1.3rem, 7vw, 1.8rem);
+  }
+}
+
 /* echtes Input liegt unsichtbar über den Boxen */
 .private-room__input {
   position: absolute;

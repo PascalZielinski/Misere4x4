@@ -18,6 +18,22 @@
         "musicVolume": "Lautstärke für Musik",
         "toggleTheme": "Darkmode umschalten"
     },
+    "common": {
+        "back": "Zurück",
+        "language": "Sprache"
+    },
+    "unauthorized": {
+        "title": "Zugriff verweigert",
+        "home": "Zur Startseite"
+    },
+    "pumpkin": {
+        "retry": "Erneut versuchen",
+        "done": "Fertig",
+        "open": "Kürbis schnitzen"
+    },
+    "cookiePolicy": {
+        "themePreference": "Es wird nur die Theme-Einstellung gespeichert."
+    },
     "cookieConsent": {
         "title": "Cookie-Einstellungen",
         "message": "misere4x4 verwendet Cookies, um dir eine ausgezeichnete Nutzererfahrung zu bieten. Wenn du auf „Akzeptieren“ klickst, stimmst du den <policyLink>Cookie-Richtlinien</policyLink> zu.",
@@ -72,6 +88,19 @@
             "intro": "Der Halloween-Gimick auf dieser Seite ist inspiriert von <author>Neal Agarwal</author> und seinen kreativen, spielerischen Web-Experimenten.",
             "note": "Interaktive, spielerische Web-Erfahrungen wie „Halloween“ auf neal.fun dienten als Vorbild für den Grusel-Effekt.",
             "credit": "Vielen Dank an <neal>neal.fun</neal> für die Inspiration – der originale Code stammt selbstverständlich von uns, nur die Idee wurde freundlich „ausgeliehen“."
+        },
+        "categories": {
+            "music": "Musik",
+            "graphics": "Grafiken & Icons",
+            "sound": "Soundeffekte",
+            "project": "Projekt"
+        },
+        "freesoundSound": {
+            "title": "Soundeffekt (freesound_community)",
+            "intro": "Soundeffekt von <author>freesound_community</author> auf <pixabay>Pixabay</pixabay>.",
+            "license": "Pixabay-Inhaltslizenz",
+            "thanks": "Sag „Danke“ an freesound_community! Das hilft, den kreativen Geist am Leben zu halten!",
+            "licenseNote": "Mit dem Download stimmst du unserer <license>Lizenz</license> zu."
         }
     },
     "local": {
@@ -112,12 +141,6 @@
             "firstMove": "Der erste Zug geht an …",
             "startGame": "Spiel starten",
             "overwrite": "Das Spiel {{a}} vs {{b}} (gestartet am {{date}}) wird überschrieben."
-        },
-        "categories": {
-            "music": "Music",
-            "graphics": "Graphics & Icons",
-            "sound": "Sound Effects",
-            "project": "Project"
         }
     },
     "tutorial": {
@@ -142,7 +165,25 @@
         "welcome": "Willkommen, {{user}}.",
         "back": "Zurück",
         "3": "Drei in einer Reihe",
-        "start": "Öffne das start menü",
+        "role": "Administrator",
+        "close": "Schließen",
+        "readme": {
+            "heading": "3erReihe – Projekt starten",
+            "openCmd": "1. CMD öffnen",
+            "clone": "2. git clone https://github.com/PascalZielinski/Misere4x4.git 3erReihe",
+            "changeDirectory": "3. cd 3erReihe",
+            "start": "4. 3erReihe -start",
+            "editorTitle": "README.txt - Editor"
+        },
+        "adjustTime": "Uhrzeit anpassen",
+        "toggleAmPm": "AM/PM umschalten",
+        "start": "Start",
+        "live": "Live",
+        "terminal": {
+            "copyright": "(c) Louvre Systems. Alle Rechte vorbehalten.",
+            "readmeHint": "Anleitung: siehe README.txt",
+            "helpHint": "Tippe \"help\" für alle Befehle."
+        },
         "cmd": "Öffne ein cmd fenster",
         "gamestart": "Schreib 3erReihe -start",
         "follow": "Folge den anweisungen"
@@ -153,6 +194,9 @@
         "requeue": "Erneut suchen",
         "backToOnline": "Zurück",
         "leaderboardTitle": "Bestenliste",
+        "colName": "Name",
+        "colScore": "Punktestand",
+        "colActive": "Aktiv",
         "leaderboardEmpty": "Noch keine Spieler vorhanden.",
         "leaderboardError": "Die Bestenliste konnte nicht geladen werden.",
         "activeUser": "Aktiv",
@@ -175,17 +219,17 @@
         "title": "Privater Raum",
         "subtitle": "Spiele mit einem Freund: Erstelle einen Raum oder tritt mit einem Code bei.",
         "createTitle": "Neuen Raum erstellen",
-        "createText": "Du bekommst einen 4-stelligen Code, den du deinem Gegner schickst.",
+        "createText": "Du bekommst einen 6-stelligen Code, den du deinem Gegner schickst.",
         "create": "Raum erstellen",
         "creating": "Wird erstellt …",
         "or": "oder",
         "joinTitle": "Raum beitreten",
         "codeLabel": "Raumcode",
-        "hint": "Gib den 4-stelligen Code deines Freundes ein.",
+        "hint": "Gib den 6-stelligen Code deines Freundes ein. Ältere 4-stellige Codes funktionieren weiterhin.",
         "join": "Beitreten",
         "joining": "Trete bei …",
-        "invalid": "Bitte gib einen gültigen 4-stelligen Code ein.",
-        "notFound": "Kein Raum mit diesem Code gefunden.",
+        "invalid": "Bitte gib einen gültigen 4- oder 6-stelligen Code ein.",
+        "notFound": "Raum nicht gefunden oder nicht verfügbar.",
         "unauthorized": "Melde dich zuerst im Online-Bereich an.",
         "goOnline": "Zum Online-Bereich",
         "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
@@ -235,14 +279,6 @@
         "submit": "Absenden",
         "sending": "Wird gesendet…",
         "success": "Danke für dein Feedback!",
-        "error": "Konnte nicht gesendet werden. Versuch es nochmal.",
-        "rating": "Bewertung"
-    },
-    "freesoundSound": {
-        "title": "Soundeffekt (freesound_community)",
-        "intro": "Soundeffekt von <author>freesound_community</author> auf <pixabay>Pixabay</pixabay>.",
-        "license": "Pixabay-Inhaltslizenz",
-        "thanks": "Sag „Danke“ an freesound_community! Das hilft, den kreativen Geist am Leben zu halten!",
-        "licenseNote": "Mit dem Download stimmst du unserer <license>Lizenz</license> zu."
-        }
+        "error": "Konnte nicht gesendet werden. Versuch es nochmal."
+    }
 }

@@ -10,82 +10,147 @@ use App\Entity\RoomParticipant;
 use App\Entity\User;
 use App\Repository\QueueEntryRepository;
 use App\Repository\RoomRepository;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 final readonly class MatchmakingService
 {
     private const ROOM_TTL_SECONDS = 60;
+    private const MAX_ROOM_CODE_ATTEMPTS = 3;
+    private const ROOM_CODE_SELECTION_ATTEMPTS = 32;
 
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private QueueEntryRepository $queueEntries,
-        private RoomRepository $rooms,
+        private ManagerRegistry $doctrine,
         private MisereGameLogic $gameLogic,
     ) {
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function join(User $user): array
     {
-        $this->entityManager->wrapInTransaction(function () use ($user): void {
-            $entry = $this->queueEntries->findOneBy(['user' => $user]);
-            if (!$entry instanceof QueueEntry) {
-                $entry = new QueueEntry($user, $this->now());
-                $this->entityManager->persist($entry);
-            } elseif ($entry->getRoom() !== null) {
-                $matchedRoom = $entry->getRoom();
-                $gameState = $matchedRoom->getGameState();
-                if (
-                    $matchedRoom->getExpiresAt() > $this->now() &&
-                    ($gameState['status'] ?? null) === 'playing'
-                ) {
-                    return;
+        $userId = $this->userId($user);
+        for ($attempt = 0; $attempt < self::MAX_ROOM_CODE_ATTEMPTS; ++$attempt) {
+            $entityManager = $this->entityManager();
+            try {
+                $entityManager->wrapInTransaction(function () use ($userId, $entityManager): void {
+                    $managedUser = $entityManager->find(User::class, $userId, LockMode::PESSIMISTIC_WRITE);
+                    if (!$managedUser instanceof User) {
+                        throw new \LogicException('The authenticated user could not be reloaded.');
+                    }
+
+                    $entry = $this->queueEntries()->findOneBy(['user' => $managedUser]);
+                    $activeRoom = $this->rooms()->findActiveForUser($managedUser, $this->now());
+                    if ($activeRoom instanceof Room) {
+                        if ($entry instanceof QueueEntry && $entry->getRoom()?->getId() === $activeRoom->getId()) {
+                            return;
+                        }
+                        throw new ConflictHttpException('You already have an active game.');
+                    }
+
+                    if (!$entry instanceof QueueEntry) {
+                        $entry = new QueueEntry($managedUser, $this->now());
+                        $entityManager->persist($entry);
+                    } elseif (null !== $entry->getRoom()) {
+                        $matchedRoom = $entry->getRoom();
+                        $gameState = $matchedRoom->getGameState();
+                        if (
+                            $matchedRoom->getExpiresAt() > $this->now()
+                            && 'playing' === $gameState['status']
+                        ) {
+                            return;
+                        }
+                        $entry->setRoom(null)->setCreatedAt($this->now());
+                    }
+
+                    $entityManager->flush();
+                });
+            } catch (UniqueConstraintViolationException $exception) {
+                $this->doctrine->resetManager();
+                if ($attempt + 1 < self::MAX_ROOM_CODE_ATTEMPTS) {
+                    continue;
                 }
-                $entry->setRoom(null)->setCreatedAt($this->now());
+
+                throw new ConflictHttpException('Could not allocate a unique room code. Please try again.', $exception);
             }
 
-            $this->entityManager->flush();
-            $this->matchWaitingPlayers();
-        });
+            return $this->status($this->reloadUser($userId));
+        }
 
-        return $this->status($user);
+        throw new ConflictHttpException('Could not allocate a unique room code. Please try again.');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function status(User $user): array
     {
-        $this->entityManager->wrapInTransaction(function (): void {
-            $this->matchWaitingPlayers();
-        });
+        $userId = $this->userId($user);
+        for ($attempt = 0; $attempt < self::MAX_ROOM_CODE_ATTEMPTS; ++$attempt) {
+            $entityManager = $this->entityManager();
+            $managedUser = $entityManager->find(User::class, $userId);
+            if (!$managedUser instanceof User) {
+                throw new \LogicException('The authenticated user could not be reloaded.');
+            }
 
-        $entry = $this->queueEntries->findOneBy(['user' => $user]);
-        if (!$entry instanceof QueueEntry) {
-            return ['status' => 'idle', 'queueCount' => $this->queueEntries->countWaiting()];
+            try {
+                $entityManager->wrapInTransaction(function (): void {
+                    $this->matchWaitingPlayers();
+                });
+            } catch (UniqueConstraintViolationException $exception) {
+                $this->doctrine->resetManager();
+                if ($attempt + 1 < self::MAX_ROOM_CODE_ATTEMPTS) {
+                    continue;
+                }
+
+                throw new ConflictHttpException('Could not allocate a unique room code. Please try again.', $exception);
+            }
+
+            $entries = $this->queueEntries();
+            $entry = $entries->findOneBy(['user' => $managedUser]);
+            if (!$entry instanceof QueueEntry) {
+                return ['status' => 'idle', 'queueCount' => $entries->countWaiting()];
+            }
+
+            $room = $entry->getRoom();
+            if (null !== $room && 'playing' === $room->getGameState()['status']) {
+                return [
+                    'status' => 'matched',
+                    'roomUuid' => $room->getRoomUuid(),
+                    'queueCount' => $entries->countWaiting(),
+                ];
+            }
+
+            return ['status' => 'waiting', 'queueCount' => $entries->countWaiting()];
         }
 
-        $room = $entry->getRoom();
-        if ($room !== null && ($room->getGameState()['status'] ?? null) === 'playing') {
-            return [
-                'status' => 'matched',
-                'roomUuid' => $room->getRoomUuid(),
-                'queueCount' => $this->queueEntries->countWaiting(),
-            ];
-        }
-
-        return ['status' => 'waiting', 'queueCount' => $this->queueEntries->countWaiting()];
+        throw new ConflictHttpException('Could not allocate a unique room code. Please try again.');
     }
 
     public function leave(User $user): void
     {
-        $entry = $this->queueEntries->findOneBy(['user' => $user]);
-        if (!$entry instanceof QueueEntry) {
-            return;
-        }
-        if ($entry->getRoom() !== null && ($entry->getRoom()->getGameState()['status'] ?? null) === 'playing') {
-            throw new ConflictHttpException('You cannot leave the queue after a match has started.');
-        }
+        $userId = $this->userId($user);
+        $this->entityManager()->wrapInTransaction(function () use ($userId): void {
+            $entityManager = $this->entityManager();
+            $managedUser = $entityManager->find(User::class, $userId, LockMode::PESSIMISTIC_WRITE);
+            if (!$managedUser instanceof User) {
+                throw new \LogicException('The authenticated user could not be reloaded.');
+            }
 
-        $this->entityManager->remove($entry);
-        $this->entityManager->flush();
+            $entry = $this->queueEntries()->findOneBy(['user' => $managedUser]);
+            if (!$entry instanceof QueueEntry) {
+                return;
+            }
+            if (null !== $entry->getRoom() && 'playing' === $entry->getRoom()->getGameState()['status']) {
+                throw new ConflictHttpException('You cannot leave the queue after a match has started.');
+            }
+
+            $entityManager->remove($entry);
+        });
     }
 
     public function requeueParticipants(Room $room): void
@@ -96,11 +161,11 @@ final readonly class MatchmakingService
                 continue;
             }
 
-            $entry = $this->queueEntries->findOneBy(['user' => $user]);
+            $entry = $this->queueEntries()->findOneBy(['user' => $user]);
             if (!$entry instanceof QueueEntry) {
                 $entry = new QueueEntry($user, $this->now());
-                $this->entityManager->persist($entry);
-            } elseif ($entry->getRoom() === null || $entry->getRoom() === $room) {
+                $this->entityManager()->persist($entry);
+            } elseif (null === $entry->getRoom() || $entry->getRoom() === $room) {
                 $entry->setRoom(null)->setCreatedAt($this->now());
             }
         }
@@ -109,17 +174,43 @@ final readonly class MatchmakingService
     private function matchWaitingPlayers(): void
     {
         $this->removeExpiredRooms();
-        $waiting = $this->queueEntries->findWaitingForUpdate();
+        $waiting = $this->queueEntries()->findWaiting();
+        $userIds = [];
+        foreach ($waiting as $entry) {
+            $id = $entry->getUser()?->getId();
+            if (null !== $id) {
+                $userIds[] = $id;
+            }
+        }
+        $userIds = array_values(array_unique($userIds));
+        sort($userIds);
+        $entityManager = $this->entityManager();
+        foreach ($userIds as $userId) {
+            $entityManager->find(User::class, $userId, LockMode::PESSIMISTIC_WRITE);
+        }
+
+        $waiting = $this->queueEntries()->lockWaitingForUpdate();
+        foreach ($waiting as $key => $entry) {
+            $user = $entry->getUser();
+            if ($user instanceof User && $this->rooms()->findActiveForUser($user, $this->now()) instanceof Room) {
+                $entityManager->remove($entry);
+                unset($waiting[$key]);
+            }
+        }
+        $waiting = array_values($waiting);
+        if ([] !== $waiting) {
+            $entityManager->flush();
+        }
+
+        $reservedCodes = [];
         while (count($waiting) >= 2) {
             $first = array_shift($waiting);
             $second = array_shift($waiting);
-            if (!$first instanceof QueueEntry || !$second instanceof QueueEntry) {
-                break;
-            }
-
             $now = $this->now();
+            $roomCode = $this->availableCode($reservedCodes);
+            $reservedCodes[$roomCode] = true;
             $room = (new Room())
-                ->setRoomCode($this->availableCode())
+                ->setRoomCode($roomCode)
                 ->setMatchmade(true)
                 ->setCreatedAt($now)
                 ->setLastMoveAt($now)
@@ -135,36 +226,79 @@ final readonly class MatchmakingService
             $first->setRoom($room);
             $second->setRoom($room);
 
-            $this->entityManager->persist($room);
+            $entityManager = $this->entityManager();
+            $entityManager->persist($room);
             foreach ($room->getRoomParticipants() as $participant) {
-                $this->entityManager->persist($participant);
+                $entityManager->persist($participant);
             }
         }
     }
 
-    private function availableCode(): int
+    /**
+     * @param array<int, true> $reservedCodes
+     */
+    private function availableCode(array $reservedCodes = []): int
     {
-        $usedCodes = array_fill_keys($this->rooms->findRoomCodes(), true);
-        $start = random_int(1000, 9999);
-        for ($offset = 0; $offset < 9000; ++$offset) {
-            $code = 1000 + (($start - 1000 + $offset) % 9000);
-            if (!isset($usedCodes[$code])) {
+        for ($attempt = 0; $attempt < self::ROOM_CODE_SELECTION_ATTEMPTS; ++$attempt) {
+            $code = random_int(100000, 999999);
+            if (!isset($reservedCodes[$code]) && !$this->rooms()->roomCodeExists($code)) {
                 return $code;
             }
         }
 
-        throw new ConflictHttpException('All four-digit room codes are currently in use.');
+        throw new ConflictHttpException('Could not allocate a unique room code. Please try again.');
     }
 
     private function removeExpiredRooms(): void
     {
-        $expired = $this->rooms->findExpired($this->now());
+        $expired = $this->rooms()->findExpired($this->now());
+        $entityManager = $this->entityManager();
         foreach ($expired as $room) {
-            $this->entityManager->remove($room);
+            $entityManager->remove($room);
         }
-        if ($expired !== []) {
-            $this->entityManager->flush();
+        if ([] !== $expired) {
+            $entityManager->flush();
         }
+    }
+
+    private function entityManager(): EntityManagerInterface
+    {
+        $manager = $this->doctrine->getManager();
+        if (!$manager instanceof EntityManagerInterface) {
+            throw new \LogicException('The Doctrine manager must be an ORM entity manager.');
+        }
+
+        return $manager;
+    }
+
+    private function queueEntries(): QueueEntryRepository
+    {
+        return $this->entityManager()->getRepository(QueueEntry::class);
+    }
+
+    private function rooms(): RoomRepository
+    {
+        return $this->entityManager()->getRepository(Room::class);
+    }
+
+    private function reloadUser(int $id): User
+    {
+        $user = $this->entityManager()->find(User::class, $id);
+        if (!$user instanceof User) {
+            throw new \LogicException('The authenticated user could not be reloaded.');
+        }
+
+        return $user;
+    }
+
+    private function userId(User $user): int
+    {
+        $id = $user->getId();
+        if (null === $id) {
+            throw new \LogicException('A persisted user is required for matchmaking.');
+        }
+
+        return $id;
     }
 
     private function now(): \DateTimeImmutable

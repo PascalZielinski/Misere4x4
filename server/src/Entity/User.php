@@ -6,7 +6,6 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -43,13 +42,16 @@ class User implements UserInterface
     #[ORM\Column(length: 255)]
     private string $usedToken = '';
 
+    private ?string $responseToken = null;
+
     public function __construct()
     {
         $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
 
         $this->createdAt = $now;
         $this->lastSeenAt = $now;
-        $this->sessionToken = Uuid::v4()->toRfc4122();
+        $this->responseToken = bin2hex(random_bytes(32));
+        $this->sessionToken = hash('sha256', $this->responseToken);
     }
 
     public function getId(): ?int
@@ -69,14 +71,26 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getSessionToken(): ?string
+    public function getSessionTokenHash(): ?string
     {
         return $this->sessionToken;
     }
 
-    public function setSessionToken(string $sessionToken): static
+    public function setSessionTokenHash(string $sessionToken): static
     {
         $this->sessionToken = $sessionToken;
+
+        return $this;
+    }
+
+    public function getResponseToken(): ?string
+    {
+        return $this->responseToken;
+    }
+
+    public function setResponseToken(?string $responseToken): static
+    {
+        $this->responseToken = $responseToken;
 
         return $this;
     }
@@ -131,7 +145,7 @@ class User implements UserInterface
 
     public function getUserIdentifier(): string
     {
-        return (string) $this->id;
+        return sprintf('user-%s', $this->id ?? 'new');
     }
 
     public function getRoles(): array
@@ -143,12 +157,12 @@ class User implements UserInterface
     {
     }
 
-    public function getUsedToken(): string
+    public function getUsedTokenHash(): string
     {
         return $this->usedToken;
     }
 
-    public function setUsedToken(string $usedToken): static
+    public function setUsedTokenHash(string $usedToken): static
     {
         $this->usedToken = $usedToken;
 

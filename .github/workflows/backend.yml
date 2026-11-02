@@ -1,0 +1,34 @@
+name: Backend checks
+
+on:
+  push:
+
+jobs:
+  backend:
+    name: Tests, PHPStan, and PHP-CS-Fixer
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: ctype, iconv, intl, mbstring, pdo_mysql, zip, gd
+          coverage: none
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: server/vendor
+          key: ${{ runner.os }}-php-8.4-${{ hashFiles('server/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-8.4-
+
+      - name: Install backend dependencies
+        run: composer install --working-dir=server --no-interaction --prefer-dist --no-progress
+
+      - name: Run backend checks
+        run: composer check --working-dir=server

@@ -6,7 +6,8 @@ import NavBar from '../components/NavBar'
 import LocalizedLink from '../components/LocalizedLink'
 import { createRoom, joinRoom, PrivateRoomApiError } from '../api/privateRooms'
 
-const CODE_LENGTH = 4
+const CODE_LENGTH = 6
+const LEGACY_CODE_LENGTH = 4
 
 type JoinError = 'invalid' | 'notFound' | 'unauthorized' | 'generic' | null
 type Busy = 'creating' | 'joining' | null
@@ -38,7 +39,7 @@ export default function PrivateRoomPage() {
   const onJoin = async (e: FormEvent) => {
     e.preventDefault()
     if (busy) return
-    if (code.length !== CODE_LENGTH) {
+    if (code.length !== CODE_LENGTH && code.length !== LEGACY_CODE_LENGTH) {
       setJoinError('invalid')
       return
     }
@@ -153,7 +154,7 @@ export default function PrivateRoomPage() {
                     className="private-room__input"
                     type="text"
                     inputMode="numeric"
-                    pattern="\d{4}"
+                    pattern="\d{4}|\d{6}"
                     maxLength={CODE_LENGTH}
                     value={code}
                     onChange={(e) => {
@@ -185,7 +186,10 @@ export default function PrivateRoomPage() {
               <button
                 type="submit"
                 className="landing-btn private-room__btn"
-                disabled={code.length !== CODE_LENGTH || busy !== null}
+                disabled={
+                  (code.length !== CODE_LENGTH && code.length !== LEGACY_CODE_LENGTH) ||
+                  busy !== null
+                }
               >
                 {busy === 'joining' ? t('privateRoom.joining') : t('privateRoom.join')}
               </button>

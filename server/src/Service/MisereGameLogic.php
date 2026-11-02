@@ -7,6 +7,21 @@ namespace App\Service;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
+/**
+ * @phpstan-type Side 'A'|'B'
+ * @phpstan-type Mark 'X'|'O'
+ * @phpstan-type GameResult array{status: 'waiting'|'playing'|'draw'}|LostResult
+ * @phpstan-type LostResult array{status: 'lost', loser: Side, winner: Side, chains: non-empty-list<array{cells: list<int>, angle: int}>}
+ * @phpstan-type GameState array{
+ *     round: int,
+ *     status: 'waiting'|'playing'|'lost'|'draw',
+ *     firstPlayer: Side|null,
+ *     turn: Side|null,
+ *     board: list<Mark|null>,
+ *     moves: list<array{side: Side, index: int}>,
+ *     result: GameResult
+ * }
+ */
 final class MisereGameLogic
 {
     private const WINDOWS = [
@@ -25,6 +40,9 @@ final class MisereGameLogic
         [1, -1, -45],
     ];
 
+    /**
+     * @return GameState
+     */
     public function waitingState(): array
     {
         return [
@@ -38,9 +56,12 @@ final class MisereGameLogic
         ];
     }
 
+    /**
+     * @return GameState
+     */
     public function newRound(int $round): array
     {
-        $firstPlayer = random_int(0, 1) === 0 ? 'A' : 'B';
+        $firstPlayer = 0 === random_int(0, 1) ? 'A' : 'B';
 
         return [
             'round' => $round,
@@ -53,9 +74,15 @@ final class MisereGameLogic
         ];
     }
 
+    /**
+     * @param GameState $game
+     * @param Side      $side
+     *
+     * @return GameState
+     */
     public function place(array $game, string $side, int $index): array
     {
-        if ($game['status'] !== 'playing') {
+        if ('playing' !== $game['status']) {
             throw new ConflictHttpException('This game is not accepting moves.');
         }
         if ($game['turn'] !== $side) {
@@ -64,28 +91,34 @@ final class MisereGameLogic
         if ($index < 0 || $index >= 16) {
             throw new UnprocessableEntityHttpException('The cell index must be between 0 and 15.');
         }
-        if ($game['board'][$index] !== null) {
+        if (null !== $game['board'][$index]) {
             throw new ConflictHttpException('That cell is already occupied.');
         }
 
-        $mark = $side === 'A' ? 'X' : 'O';
+        $mark = 'A' === $side ? 'X' : 'O';
         $game['board'][$index] = $mark;
         $game['moves'][] = ['side' => $side, 'index' => $index];
-        $game['turn'] = $side === 'A' ? 'B' : 'A';
-        $game['result'] = $this->result($game['board'], $index, $side, $mark);
+        $game['turn'] = 'A' === $side ? 'B' : 'A';
+        $game['result'] = $this->result($game['board'], $index, $side);
         $game['status'] = $game['result']['status'];
 
         return $game;
     }
 
-    private function result(array $board, int $lastIndex, string $side, string $mark): array
+    /**
+     * @param list<Mark|null> $board
+     * @param Side            $side
+     *
+     * @return GameResult
+     */
+    private function result(array $board, int $lastIndex, string $side): array
     {
         $chains = $this->chainsThrough($board, $lastIndex);
-        if ($chains !== []) {
+        if ([] !== $chains) {
             return [
                 'status' => 'lost',
                 'loser' => $side,
-                'winner' => $side === 'A' ? 'B' : 'A',
+                'winner' => 'A' === $side ? 'B' : 'A',
                 'chains' => $chains,
             ];
         }
@@ -103,6 +136,11 @@ final class MisereGameLogic
         return ['status' => 'draw'];
     }
 
+    /**
+     * @param list<Mark|null> $board
+     *
+     * @return list<array{cells: list<int>, angle: int}>
+     */
     private function chainsThrough(array $board, int $index): array
     {
         $mark = $board[$index];
