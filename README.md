@@ -2,11 +2,11 @@
 
 A browser game: **misère three-in-a-row on a 4×4 board**. Two players alternately place their mark; whoever completes a line of three (or more) of their own marks **loses**.
 
-The project is a showcase / application project. It contains a local two-player game, an interactive tutorial, a mocked online lobby, a rating form, a licenses page, and a hidden "admin desktop" easter egg.
+The project contains a local two-player game, an interactive tutorial, online matchmaking and private rooms, a rating form, a licenses page, and a hidden "admin desktop" easter egg. The online features use the Symfony API and Mercure; the local game works without a backend.
 
-- Stack: React, TypeScript, Vite, React Router (data router), react-i18next
+- Stack: React, TypeScript, Vite, React Router (data router), react-i18next; PHP 8.2+, Symfony 7.4, Doctrine ORM, MariaDB, Mercure
 - Languages: German (`de`) and English (`en`)
-- Persistence: browser storage only (no backend is required to run the local game)
+- Persistence: local game and preferences in browser storage; users, queue entries, and rooms in the backend database
 
 ---
 
@@ -25,7 +25,7 @@ The project is a showcase / application project. It contains a local two-player 
 11. [Theming](#11-theming)
 12. [Audio](#12-audio)
 13. [Admin easter egg](#13-admin-easter-egg)
-14. [Online mode](#14-online-mode)
+14. [Online mode and backend](#14-online-mode-and-backend)
 15. [Rating form](#15-rating-form)
 16. [Conventions](#16-conventions)
 17. [Guide for reviewers](#17-guide-for-reviewers)
@@ -52,10 +52,10 @@ The project is a showcase / application project. It contains a local two-player 
 | Landing page | `/:lang` | Complete |
 | Local two-player game | `/:lang/local` | Complete (autosave, score, result dialog, move lists) |
 | Interactive tutorial | `/:lang/tutorial` | Complete (6 guided steps on a prepared board) |
-| Online hub | `/:lang/online` | UI only, queue counter is mocked |
-| Matchmaking queue | `/:lang/online/queue` | UI only, mocked |
-| Private room | `/:lang/online/private` | UI only, server calls are marked `TODO` |
-| Private room lobby | `/:lang/online/private/room/:code?` | Not implemented (route is commented out) |
+| Online hub | `/:lang/online` | Backend-connected |
+| Matchmaking queue | `/:lang/online/queue` | Backend-connected |
+| Private room | `/:lang/online/private` | Backend-connected |
+| Private room game | `/:lang/online/private/room/:code` | Backend-connected; live updates via Mercure |
 | Rating form | `/:lang/rating` | Complete (posts to a configurable webhook) |
 | Licenses and credits | `/:lang/licenses` | Complete |
 | Admin login and desktop | `/:lang/admin`, `/:lang/admin/dashboard` | Easter egg, client-side only (see §13) |
@@ -65,28 +65,69 @@ The project is a showcase / application project. It contains a local two-player 
 
 ## 3. Getting started
 
-Requirements: a current Node.js LTS and npm.
+### Frontend only
+
+The local game and tutorial need only Node.js 22 and npm. From the repository root:
 
 ```bash
-npm install
-npm run dev        # development server
-npm run build      # production build
-npm run preview    # serve the production build locally
+cd client
+npm ci
+cp .env.example .env.local
+npm run dev
 ```
 
-> The script names above are the standard Vite ones. Check `package.json` for the exact scripts and add linting/test scripts there once they exist.
+Open the URL printed by Vite (normally `http://localhost:5173`). Set `VITE_DEBUG=true` in `client/.env.local` if you want to skip the landing page's backend health check while reviewing the frontend without the API.
+
+Available frontend checks:
+
+```bash
+cd client
+npm run build       # TypeScript project build + Vite production build
+npm run lint        # Oxlint
+npm run preview     # serve the production build locally
+```
+
+### Full application with Docker Compose
+
+The online queue and rooms need the API, database, worker, and Mercure hub. Requirements: Docker with the Compose plugin. For local browser access, create a root `.env` (do not commit it) with:
+
+```dotenv
+VITE_SERVER=http://localhost:8080
+VITE_API_URL=http://server
+MERCURE_PUBLIC_URL=http://localhost:3000/.well-known/mercure
+API_CORS_ORIGINS=http://localhost:5173
+MERCURE_CORS_ORIGINS=http://localhost:5173
+MERCURE_JWT_SECRET=replace-with-a-random-value
+```
+
+Use the same `MERCURE_JWT_SECRET` for the API and hub; generate a local value, for example with `openssl rand -hex 32`. These defaults are for local review only.
+
+```bash
+docker compose build
+docker compose up -d db mercure
+docker compose run --rm server composer install --no-interaction
+docker compose up -d server worker client
+docker compose exec server php bin/console doctrine:migrations:migrate --no-interaction
+```
+
+The app is at `http://localhost:5173`, the API at `http://localhost:8080`, and Mercure at `http://localhost:3000`. The compose file maps MariaDB to host port `3307`; phpMyAdmin is optional on port `8081` and can be started separately with `docker compose up -d phpmyadmin`. To stop the services, run `docker compose down`; add `-v` only when you intentionally want to delete the persisted database and Mercure data.
+
+If ports are already in use, change the host-side port mappings in `docker-compose.yml`. Do not expose the development credentials or the default Mercure secret to a public environment.
 
 ---
 
 ## 4. Configuration
 
-Configuration is read from Vite environment variables (`import.meta.env`). All `VITE_*` variables are **embedded into the client bundle** and are therefore public by nature.
+Frontend configuration is read from Vite environment variables (`import.meta.env`). Every `VITE_*` value is **embedded into the client bundle** and is public by nature; never put credentials or private webhook secrets in one.
 
 | Variable | Used by | Purpose |
 |---|---|---|
 | `VITE_SERVER` | `LandingPage` | Base URL of the game server. A `GET {VITE_SERVER}/health` request checks availability before entering the online area. |
-| `VITE_WEBHOOK` | `RatingPage` | Endpoint that receives rating submissions as `POST` JSON `{ "content": string }`. |
+| `VITE_WEBHOOK` | `RatingPage` | Optional endpoint that receives rating submissions as `POST` JSON `{ "content": string }`. Treat the URL as public. |
 | `VITE_DEBUG` | `LandingPage` | When `"true"`, skips the server availability check. Can also be activated per page load with `?debug=1`. |
+| `VITE_API_URL` | Vite dev server | API target for the `/api` development proxy. Set to `http://server` in Compose or `http://localhost:8080` when running Vite directly on the host. |
+
+The backend uses `DATABASE_URL`, `MERCURE_URL`, `MERCURE_PUBLIC_URL`, `MERCURE_JWT_SECRET`, `MERCURE_JWT_ISSUER`, and `API_CORS_ORIGINS`. The development database URL is in `server/.env`; Compose supplies the Mercure and CORS values. See `server/.env.example` for the Symfony environment reference.
 
 Static files referenced from `index.html`:
 
@@ -98,70 +139,58 @@ Static files referenced from `index.html`:
 ## 5. Project structure
 
 ```
-index.html
-public/
-  theme-init.js            # pre-paint theme bootstrap
-  favicon.svg
-src/
-  main.tsx                 # entry: fonts, global CSS, i18n, <App/>
-  App.tsx                  # router definition, RootLayout, language loader
-  i18n/
-    index.ts               # i18next setup
-    languages.ts           # SUPPORTED_LANGS, detectLanguage, isSupported
-  locales/
-    de.json
-    en.json
-  pages/
-    landingpage.tsx
-    localgamepage.tsx
-    Tutorialpage.tsx
-    Onlinepage.tsx
-    Queuepage.tsx
-    Privateroompage.tsx
-    Ratingpage.tsx
-    licensespage.tsx
-    Adminpage.tsx
-    AdminDashboard.tsx
-    404.tsx
-  components/
-    NavBar.tsx             # language menu, audio menu, theme toggle
-    LocalizedLink.tsx      # <Link> that prefixes the current language
-    LanguageSwitcher.tsx   # <select> based language switcher
-    BackgroundMusic.tsx    # global looping music with autoplay unlock
-  game/
-    placement.ts           # board constants, placeAt, cellLabel
-    result.ts              # getResult, chain detection, pillAngles
-    firstTurn.ts           # Side type, pickFirstPlayer, useFirstTurnSpin
-  hooks/
-    useTheme.ts
-  utils/
-    audioSettings.ts       # external store for volume settings
-    localGameStorage.ts    # save/load of the local game
-  assets/                  # svg icons, ogg/mp3 audio, images
+client/
+  src/
+    api/                    # typed fetch clients for queue and private rooms
+    components/             # navigation, shared UI, background audio
+    game/                   # pure local game rules
+    hooks/                  # React hooks, including theme
+    i18n/                   # language setup
+    locales/                # German and English resources
+    pages/                  # route pages and page-local stylesheets
+    utils/                  # browser persistence and settings
+  public/                   # static files loaded by URL
+  package.json              # frontend scripts and dependencies
+server/
+  config/                    # Symfony, Doctrine, Security, Mercure configuration
+  src/
+    Controller/              # health and API endpoints
+    Entity/ Repository/      # persisted users, queue entries, and rooms
+    Migrations/              # Doctrine migrations
+    Service/                 # matchmaking, room lifecycle, game rules
+  tests/                     # PHPUnit tests
+  composer.json
+  Dockerfile
+docker-compose.yml           # frontend, API, worker, MariaDB, Mercure, phpMyAdmin
 ```
 
-Each page has a stylesheet next to it (`landingpage.css`, `localgamepage.css`, and so on). Stylesheets are plain global CSS imported by the page that needs them.
+Frontend styles are plain CSS files alongside their pages/components. The server is a Symfony JSON API; the dedicated worker performs periodic maintenance.
 
 ---
 
 ## 6. Architecture
 
 ```
-main.tsx
+client/src/main.tsx
   └─ App (RouterProvider)
        └─ /:lang  (loader: validate language, sync i18n)
             └─ RootLayout  = <BackgroundMusic/> + <Outlet/>
                  └─ page
                       └─ NavBar, page content, footer
+
+client/src/api/* ── /api/* ──▶ Symfony controllers/services
+                                      ├─ Doctrine ──▶ MariaDB
+                                      ├─ worker ──▶ maintenance tasks
+                                      └─ Mercure ──▶ room updates to browsers
 ```
 
 Principles used throughout the code base:
 
-- **Pure game rules.** Everything in `src/game/` is side-effect free except the `useFirstTurnSpin` hook. Rules can be tested without React.
+- **Pure game rules.** The rules in `client/src/game/` are side-effect free except the `useFirstTurnSpin` hook. Server-side online rules live in `server/src/Service/MisereGameLogic.php`.
 - **Immutable state updates.** `placeAt` returns a new game object; the UI replaces state and persists it.
 - **External stores for cross-component state.** Audio volume uses `useSyncExternalStore` with a module-level store and `localStorage` persistence.
 - **Language is part of the URL.** Every route lives under `/:lang`; links are generated through `LocalizedLink`.
-- **Defensive persistence.** Stored data is parsed field by field with safe defaults.
+- **Defensive persistence.** Browser-stored data is parsed field by field with safe defaults; online state is stored in Doctrine entities.
 
 ---
 
@@ -175,13 +204,16 @@ React Router (data router, `createBrowserRouter`).
   index              → LandingPage
   local              → LocalGame
   licenses           → LicensesPage
+  cookieTos          → CookieTosPage
   tutorial           → TutorialPage
   admin              → AdminPage
   admin/dashboard    → AdminDashboard
   online             → OnlinePage
   online/queue       → QueuePage
   online/private     → PrivateRoomPage
+  online/private/room/:code → PrivateRoomGamePage
   rating             → RatingPage
+  401                → Unauthorized
   *                  → NotFound
 ```
 
@@ -351,15 +383,19 @@ The terminal game reuses `placeAt` and `getResult` from `src/game/`.
 
 ---
 
-## 14. Online mode
+## 14. Online mode and backend
 
-The online area currently consists of the UI shell:
+The online mode is implemented across the React client and Symfony API. It requires the complete Docker setup (or an equivalent local backend configuration); the local two-player game does not.
 
-- **Landing availability check:** `GET {VITE_SERVER}/health` with a 3 second timeout (opaque `no-cors` request). Failure shows a localized "server not reachable" message.
-- **Online hub:** "Queue" starts a mocked queue panel whose player count cycles through a fixed list of numbers; "Private game" opens the private-room page.
-- **Private room:** create a room, or join with a 4-digit numeric code. The server calls are stubbed with `TODO` markers; the success path navigates to the (not yet existing) room route. Error states are modeled: `invalid`, `notFound`, `generic`.
+- **Health check:** `GET {VITE_SERVER}/health`; a failed check displays a localized message.
+- **Accounts:** `POST /api/users` creates a user; queue and room actions use the session token.
+- **Matchmaking:** `POST`, `GET`, and `DELETE /api/queue` join, check, and leave the queue. The worker runs periodic maintenance.
+- **Private rooms:** `POST /api/private-rooms` creates a room; `POST /api/private-rooms/join` joins by code. `GET /api/private-rooms/{identifier}` retrieves room state, and `/moves` and `/restart` handle game actions.
+- **Live state:** the API issues a room-scoped Mercure subscription token; browsers receive room updates from the hub.
+- **Game rules:** `server/src/Service/MisereGameLogic.php` validates turns and moves and evaluates wins/draws independently of the frontend.
+- **Storage:** Doctrine persists users, queue entries, rooms, and participants in MariaDB. Apply schema migrations after installing dependencies with the command in §3.
 
-The server protocol is not part of this repository.
+The HTTP contract is defined by the controllers in `server/src/Controller/` and the client API modules in `client/src/api/`.
 
 ---
 
@@ -385,21 +421,40 @@ The server protocol is not part of this repository.
 
 ## 17. Guide for reviewers
 
-Suggested reading order:
+### Reviewer setup
 
-1. `src/game/*`: the core rules (small, pure, self-contained).
-2. `src/utils/localGameStorage.ts` and `src/utils/audioSettings.ts`: persistence.
-3. `src/App.tsx`, `src/i18n/*`: routing and language handling.
-4. `src/pages/localgamepage.tsx`: the main UI and its state machine.
-5. `src/pages/Tutorialpage.tsx`: guided overlay with measured tooltips.
-6. `src/components/*`: NavBar, BackgroundMusic, LocalizedLink.
-7. `src/pages/Adminpage.tsx`, `AdminDashboard.tsx`: easter egg (see §13 before judging security).
-8. Online pages: UI shells only, see §14.
+For a quick frontend review, follow the **Frontend only** steps in §3. That is sufficient to review the local game, tutorial, routing, translations, theme, audio, and admin easter egg. Use `VITE_DEBUG=true` if no backend is running. To exercise registration, matchmaking, private rooms, and live updates, follow the **Full application with Docker Compose** steps instead, then use two separate browser profiles to simulate two players.
+
+Run the relevant checks from the service directories:
+
+```bash
+cd client
+npm run build
+npm run lint
+
+# After the full Docker setup and Composer install:
+cd ..
+docker compose exec server composer check
+```
+
+`composer check` runs PHPUnit, PHPStan, and PHP-CS-Fixer in check mode. Frontend test scripts are not currently defined in `client/package.json`.
+
+### Suggested reading order
+
+1. `client/src/game/*`: local game rules (small, pure, self-contained).
+2. `server/src/Service/MisereGameLogic.php` and `server/tests/Service/MisereGameLogicTest.php`: online game rules and tests.
+3. `client/src/utils/localGameStorage.ts`, `client/src/utils/audioSettings.ts`, and `client/src/utils/cookieConsent.ts`: browser persistence.
+4. `client/src/App.tsx`, `client/src/i18n/*`: routing and language handling.
+5. `client/src/pages/localgamepage.tsx`: local game UI and state flow.
+6. `server/src/Controller/`, `server/src/Service/`, and `server/src/Entity/`: API, matchmaking, rooms, and persistence.
+7. `client/src/api/*` and `client/src/pages/PrivateRoomGamePage.tsx`: online client and live game UI.
+8. `client/src/pages/Tutorialpage.tsx` and `client/src/components/*`: tutorial and shared components.
+9. `client/src/pages/Adminpage.tsx`, `client/src/pages/AdminDashboard.tsx`: easter egg (see §13 before judging security).
 
 Things that are deliberate and should be evaluated in that light:
 
 - The hard-coded admin password and the client-only dashboard guard are part of the easter egg.
-- Queue numbers on the online pages are fake placeholder data.
+- Matchmaking and private rooms use the backend; a second player is needed to exercise a complete match.
 - The terminal inside the dashboard is German-only on purpose.
 - The "who starts" spin is a purely visual effect on top of a uniform random choice made up front.
 
@@ -410,6 +465,7 @@ Useful manual test paths:
 - Audio: toggle sliders in the NavBar, verify the values persist after a reload.
 - Theme: toggle and reload; the page should not flash the other theme.
 - Admin: log in with any name, play `3erReihe -start` in the terminal, move the clock hands.
+- Online: create two user sessions in separate browser profiles, join the queue or create/join a private room, and verify that moves appear in both clients.
 
 ---
 
