@@ -40,7 +40,7 @@ The project contains a local two-player game, an interactive tutorial, online ma
 - Players alternate placing one mark on an empty cell. The first player is chosen at random.
 - A line is **three or more** adjacent identical marks in a row, column, or either diagonal.
 - **The player who completes a line loses** (misère condition). Longer chains (4) count as one chain.
-- If no three-in-a-row can be formed any more, the round is a **draw**.
+- If all 16 cells are filled without a player completing a line, the round is a **draw**.
 - A local session keeps a running score (wins per player, draws). "Play again" starts a new round with a new random first player.
 
 ---
@@ -270,7 +270,7 @@ Row-major, `index = row * SIZE + col`, `SIZE = 4`.
 
 - For the last placed mark, four directions are checked (horizontal, vertical, two diagonals) by walking outward in both directions while the mark matches and the position stays inside the board.
 - A chain with 3 or more cells counts. All qualifying chains through the last move are returned, so crossing lines are highlighted together.
-- If no chain exists, `canStillMakeThree` scans every length-3 window; a window is still possible if it contains at most one kind of mark. If no window remains, the round is a draw.
+- If no chain exists, the round continues while at least one cell is empty. The round is a draw only after the final cell is filled.
 
 ### Game flow in `LocalGame`
 

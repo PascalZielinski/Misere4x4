@@ -123,7 +123,7 @@ final class MisereGameLogicTest extends TestCase
 
     public function testFullBoardWithoutAnyThreeInARowIsADraw(): void
     {
-        $pattern = 'XXOOOOXXXXOOOXOX';
+        $pattern = 'OXOXXXOOOOXXXXOO';
         $xCells = [];
         $oCells = [];
         foreach (str_split($pattern) as $index => $mark) {
@@ -133,20 +133,27 @@ final class MisereGameLogicTest extends TestCase
                 $oCells[] = $index;
             }
         }
+        array_shift($oCells);
 
         $game = $this->gameLogic->newRound(1);
-        $firstPlayer = $game['firstPlayer'];
-        if (null === $firstPlayer) {
-            self::fail('A new round must have a first player.');
-        }
-        $currentPlayer = $firstPlayer;
+        $game['firstPlayer'] = 'A';
+        $game['turn'] = 'A';
         $nextCells = ['A' => $xCells, 'B' => $oCells];
         while ([] !== $nextCells['A'] || [] !== $nextCells['B']) {
+            $currentPlayer = $game['turn'];
+            if (null === $currentPlayer) {
+                self::fail('A running game must have an active player.');
+            }
             $cell = array_shift($nextCells[$currentPlayer]);
             self::assertNotNull($cell);
             $game = $this->gameLogic->place($game, $currentPlayer, $cell);
-            $currentPlayer = 'A' === $currentPlayer ? 'B' : 'A';
         }
+
+        self::assertSame('playing', $game['status']);
+        self::assertSame(15, count($game['moves']));
+        self::assertNull($game['board'][0]);
+
+        $game = $this->gameLogic->place($game, 'B', 0);
 
         self::assertSame('draw', $game['status']);
         self::assertSame('draw', $game['result']['status']);
